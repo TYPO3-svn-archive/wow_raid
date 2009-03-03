@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+	<meta type="array">
+		<type>database</type>
+		<description>Language labels for database tables/fields belonging to extension 'wow_raid'</description>
+	</meta>
+	<data type="array">
+		<languageKey index="default" type="array">
+			<label index="tt_content.list_type_pi1">World of Warcraft - Raids</label>
+			<label index="tx_wowraid_raids">Raid</label>
+			<label index="tx_wowraid_raids.instance">Instance</label>
+			<label index="tx_wowraid_raids.begin">Begin</label>
+			<label index="tx_wowraid_raids.prepare">Preparetime</label>
+			<label index="tx_wowraid_raids.participants">Participants</label>
+			<label index="tx_wowraid_comments">Comments</label>
+			<label index="tx_wowraid_comments.raid">Raid</label>
+			<label index="tx_wowraid_comments.author">Author</label>
+			<label index="tx_wowraid_comments.message">Message</label>
+		</languageKey>
+		<languageKey index="de" type="array">
+			<label index="tt_content.list_type_pi1">World of Warcraft - Raids</label>
+			<label index="tx_wowraid_raids">Raid</label>
+			<label index="tx_wowraid_raids.instance">Instanz</label>
+			<label index="tx_wowraid_raids.begin">Beginn</label>
+			<label index="tx_wowraid_raids.prepare">Vorbereitungszeit</label>
+			<label index="tx_wowraid_raids.participants">Teilnehmer</label>
+			<label index="tx_wowraid_comments">Kommentare</label>
+			<label index="tx_wowraid_comments.raid">Raid</label>
+			<label index="tx_wowraid_comments.author">Autor</label>
+			<label index="tx_wowraid_comments.message">Nachricht</label>
+		</languageKey>
+	</data>
+</T3locallang>

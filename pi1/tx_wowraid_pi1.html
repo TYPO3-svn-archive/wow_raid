@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	<title>tx_wowraid_pi1</title>
+  <link rel="stylesheet" type="text/css" href="tx_wowraid_pi1.css" />
+</head>    
+<body>
+<!--------------------------------------------------------------------------------------------------------------------->
+<div class="tx_wowraid_pi1">
+<!-- ###LISTVIEW### begin -->
+  <!-- ###FE_USER### begin -->
+  ###NEW###
+  <!-- ###FE_USER### end -->
+  <table class="tx_wowraid_pi1_list" cellpadding="0" cellspacing="0" border="1" valign="top" width="100%">
+    <tr>
+      <th class="col1" width="70%">###LLL_NAME###</th>
+      <th class="col2" width="0%">###LLL_BEGIN###</th>
+      <th class="col3" width="0%">###LLL_INVITE###</th>
+      <th class="col4" width="0%">#</th>
+      <th class="col5" width="30%">###LLL_PARTICIPANTS###</th>
+    </tr>
+    <!-- ###RAID### begin -->
+    <tr>
+      <td class="col1" valign="top">###NAME->DETAIL### ###ADMIN###</td>
+      <td class="col2" valign="top">###BEGIN### (###DAYS###)</td>
+      <td class="col3" valign="top">###INVITE###</td>
+      <td class="col4" valign="top">###PARTICIPANTS###</td>
+      <td class="col5" valign="top"><table class="tx_wowraid_pi1_list" border="0">
+        <!-- ###PARTICIPANTS_LIST### begin -->
+        <tr><td>###NAME### ###OFFICER###</td></tr>
+        <!-- ###PARTICIPANTS_LIST### end -->
+      </table></td>
+    </tr>
+    <!-- ###RAID### begin -->
+    <!-- ###EMPTY### begin -->
+    <tr>
+      <td class="col1" valign="top" colspan="5">###LLL_NORAIDS###</td>
+    </tr>
+    <!-- ###EMPTY### begin -->
+  </table>
+<!-- ###LISTVIEW### end -->
+</div>
+<!--------------------------------------------------------------------------------------------------------------------->
+<div class="tx_wowraid_pi1">
+<!-- ###SINGLEVIEW### begin -->
+    ###LLL_NAME###:###NAME###<br/>
+    ###LLL_BEGIN###:###BEGIN###<br/>
+    ###LLL_PREPARE###:###PREPARE###<br/>
+    ###LLL_INVITE###:###INVITE###<br/>
+    <table class="tx_wowraid_pi1_list" border="1">
+      <!-- ###PARTICIPANTS_LIST### begin -->
+      <tr><td>###NAME### ###OFFICER###</td></tr>
+      <!-- ###PARTICIPANTS_LIST### end -->
+    </table>
+    <!-- ###FE_USER### begin -->
+    <form action="###URL###" method="POST">
+      ###HIDDEN###
+      <select name="###ID_JOIN###">###OPTIONS_CHARS###</select><input type="submit" value="###LLL_JOIN###"/><br/>
+    </form>
+    <form action="###URL###" method="POST">
+      ###HIDDEN###
+      <textarea name="###ID_COMMENT###"></textarea><input type="submit" value="###LLL_COMMENT###"/><br/>
+    </form>
+    <!-- ###FE_USER### end -->
+    <table class="tx_wowraid_pi1_comments" border="1">
+      <!-- ###COMMENTS### begin -->
+      <tr><td valign="top">###AUTHOR###<br/>###DATETIME###</td><td valign="top">###MESSAGE###</td></tr>
+      <!-- ###COMMENTS### end -->
+    </table>
+    <a href="###URL###"><input type="button" value="###LLL_BACK###"/></a>
+<!-- ###SINGLEVIEW### end -->
+</div>
+<!--------------------------------------------------------------------------------------------------------------------->
+<div class="tx_wowraid_pi1">
+<!-- ###CREATE### begin -->
+  <!-- ###FE_USER### begin -->
+    <form action="###URL###" method="POST">
+      <p>Neue Instanz erstellen:</p>
+      <lable>###LLL_NAME###:     </lable><select name="###ID_INSTANCE###">###OPTIONS_INSTANCE###</select><br/>
+      <lable>###LLL_BEGIN###:    </lable><input type="text" name="###ID_BEGIN###"    value="" /><br/>
+      <lable>###LLL_PREPARE###:  </lable><input type="text" name="###ID_PREPARE###"  value="" /><br/>
+      <lable>###LLL_OFFICER###:  </lable><select name="###ID_OFFICER###">###OPTIONS_CHARS###</select><br/>
+      <a href="###URL###"><input type="button" value="###LLL_CANCEL###"/></a>
+      <input type="submit" value="###LLL_SUBMIT###"/>
+    </form>
+  <!-- ###FE_USER### end -->
+  <!-- ###NO_USER### begin -->
+  ###LLL_NOUSER###
+  <a href="###URL###"><input type="button" value="###LLL_BACK###"/></a>
+  <!-- ###NO_USER### end -->
+<!-- ###CREATE### end -->
+</div>
+<!--------------------------------------------------------------------------------------------------------------------->
+<div class="tx_wowraid_pi1">
+<!-- ###EDIT### begin -->
+  <form action="###URL###" method="POST">
+    ###HIDDEN###
+    <lable>###LLL_NAME###:     </lable><select name="###ID_INSTANCE###">###OPTIONS_INSTANCE###</select><br/>
+    <lable>###LLL_BEGIN###:    </lable><input type="text" name="###ID_BEGIN###"    value="###BEGIN###"   /><br/>
+    <lable>###LLL_PREPARE###:  </lable><input type="text" name="###ID_PREPARE###"  value="###PREPARE###" /><br/>
+    <table class="tx_wowraid_pi1_list" border="1">
+      <!-- ###PARTICIPANTS_LIST### begin -->
+      <tr><td>###NAME### ###OFFICER###</td></tr>
+      <!-- ###PARTICIPANTS_LIST### end -->
+    </table>
+    <a href="###URL###"><input type="button" value="###LLL_CANCEL###"/></a>
+    <input type="submit" value="###LLL_SUBMIT###"/>
+  </form>
+<!-- ###EDIT### end -->
+</div>
+<!--------------------------------------------------------------------------------------------------------------------->
+<div class="tx_wowraid_pi1">
+<!-- ###ERROR### begin -->
+<div class="tx_wowraid_pi1_error">###ERROR_MSG###</div>
+<!-- ###ERROR### end -->
+</div>
+<!--------------------------------------------------------------------------------------------------------------------->
+</body>
+</html>

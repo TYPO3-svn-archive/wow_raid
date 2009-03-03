@@ -1,0 +1,5 @@
+plugin.tx_wowraid_pi1 {
+  template {
+    html = EXT:wow_raid/pi1/tx_wowraid_pi1.html
+  }
+}

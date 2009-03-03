@@ -1,0 +1,11 @@
+### configure plugin ###
+plugin.tx_wowraid_pi1 {
+  template {
+    html = TEMPLATE
+    html {
+      template = FILE
+      template.file = {$plugin.tx_wowraid_pi1.template.html}
+    }
+  }
+  _CSS_DEFAULT_STYLE = @import url("../typo3conf/ext/wow_raid/pi1/tx_wowraid_pi1.css");
+}
