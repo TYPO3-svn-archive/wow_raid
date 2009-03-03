@@ -259,9 +259,14 @@ class tx_wowraid_pi1 extends tslib_pibase {
     if( $tpl_comments = $this->cObj->getSubpart($tpl,'###COMMENTS###') ){
       $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*','tx_wowraid_comments',sprintf('raid = %d',$data['uid'])); unset($tmp);
       while( $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res) ){
+        $row['author'] = $this->pi_getRecord('fe_users',$row['author']);
+        $row['character'] = array_shift(array_intersect(explode(',',$data['participants']),explode(',',$row['author']['tx_wowcharacter_wowchars'])));
+        $row['character'] = $this->pi_getRecord('tx_wowcharacter_characters',$row['character']);
+        $row['character'] = $row['character']['name'];
         $tmp .= $this->cObj->substituteMarkerArray($tpl_comments,array(
           '###DATETIME###' => date('m.d.Y H:i',$row['crdate']),
-          '###AUTHOR###' => $row['author'],
+          '###AUTHOR###' => $row['author']['username'],
+          '###CHARACTER###' => $row['character'],
           '###MESSAGE###' => $row['message']
         ));
       }
