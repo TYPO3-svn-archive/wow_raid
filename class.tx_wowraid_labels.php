@@ -47,4 +47,4 @@ class tx_wowraid_labels{
   }
   
 }
-?> 
+?>

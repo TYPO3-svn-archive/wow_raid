@@ -50,6 +50,8 @@ class tx_wowraid_pi1 extends tslib_pibase {
     $this->pi_setPiVarDefaults();
     $this->pi_loadLL();    // Loading the LOCAL_LANG values
     $this->pi_USER_INT_obj=1;  // Configuring so caching is not expected. This value means that no cHash params are ever set. We do this, because it's a USER_INT object!
+    $this->pi_initPIflexForm();
+    if(!( $this->conf['pid'] = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'raids_folder', 'sDEF') )) throw new Exception('No start folder defined!');
     $GLOBALS['TYPO3_DB']->debugOutput = false;
     $this->instances = new tx_wowraid_instances('typo3temp/');
     /* ACTIONS */
@@ -136,7 +138,7 @@ class tx_wowraid_pi1 extends tslib_pibase {
   */
   function actionCreate(){
     $res = $GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_wowraid_raids',array(
-      'pid' => 12,
+      'pid' => $this->conf['pid'],
       'tstamp' => time(),
       'crdate' => time(),
       'cruser_id' => 2,
@@ -153,7 +155,7 @@ class tx_wowraid_pi1 extends tslib_pibase {
     $comment = $this->piVars['comment'];
     $author = $GLOBALS['TSFE']->fe_user->user['uid'];
     $res = $GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_wowraid_comments',array(
-      'pid' => 12,
+      'pid' => $this->conf['pid'],
       'tstamp' => time(),
       'crdate' => time(),
       'raid' => $uid,
@@ -192,6 +194,7 @@ class tx_wowraid_pi1 extends tslib_pibase {
 
   function createView($tpl){
     $tpl = $this->cObj->getSubpart($tpl,'###CREATE###');
+    if(empty($GLOBALS['TSFE']->fe_user->user["tx_wowcharacter_wowchars"]))return "You don't have any characters!";
     $marker['###ID_INSTANCE###']  = "tx_wowraid_pi1[create][instance]";
     $marker['###ID_BEGIN###']     = "tx_wowraid_pi1[create][begin]";
     $marker['###ID_PREPARE###']   = "tx_wowraid_pi1[create][prepare]";

@@ -1,16 +1,16 @@
 <?php /* require_once ( t3lib_extMgm::extPath('wow_raid').'class.tx_wowraid_instances.php' ); */
 
+DEFINE('TYPO3TEMP',PATH_site.'/typo3temp/');
+
 class tx_wowraid_instances{
     
     public $xml1 = null;
     public $xml2 = null;
     public $dungeons = array();
-    private $tmp = null;
       
     public function tx_wowraid_instances($tmp,$lang=null){
       $dungeon_names = array();
       $boss_names = array();
-      $this->tmp = $tmp;
       if( !$this->load($lang) && $this->query($lang) ) $this->save($lang);
       // parse names
       foreach( $this->xml2->dungeons->dungeon as $dungeon_num => $dungeon ){
@@ -53,17 +53,16 @@ class tx_wowraid_instances{
     }
     
     private function load(){
-      if(!file_exists($this->tmp.'tx_wowraid_dungeons.xml'))return false;
-      if(!file_exists($this->tmp.'tx_wowraid_dungeonStrings.xml'))return false;
-      $this->xml1 = simplexml_load_file($this->tmp.'tx_wowraid_dungeons.xml');
-      $this->xml2 = simplexml_load_file($this->tmp.'tx_wowraid_dungeonStrings.xml');
+      if(!file_exists(TYPO3TEMP.'tx_wowraid_dungeons.xml'))return false;
+      if(!file_exists(TYPO3TEMP.'tx_wowraid_dungeonStrings.xml'))return false;
+      $this->xml1 = simplexml_load_file(TYPO3TEMP.'tx_wowraid_dungeons.xml');
+      $this->xml2 = simplexml_load_file(TYPO3TEMP.'tx_wowraid_dungeonStrings.xml');
       return( $this->xml1->dungeon && $this->xml2->dungeons->dungeon );
     }
     
     private function save(){
-      var_dump(getcwd());
-      $this->xml1->asXML($this->tmp.'tx_wowraid_dungeons.xml');
-      $this->xml2->asXML($this->tmp.'tx_wowraid_dungeonStrings.xml');
+      $this->xml1->asXML(PATH_site.'tx_wowraid_dungeons.xml');
+      $this->xml2->asXML(PATH_site.'tx_wowraid_dungeonStrings.xml');
     }
     
     public function getInstance($id){

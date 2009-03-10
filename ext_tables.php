@@ -54,4 +54,8 @@ $TCA["tx_wowraid_comments"] = array (
 		"fe_admin_fieldList" => "hidden, raid, author, message",
 	)
 );
+
+/*FLEXFORMS:*/
+include(t3lib_extMgm::extPath('wow_raid').'pi1/flexform.inc');
+
 ?>

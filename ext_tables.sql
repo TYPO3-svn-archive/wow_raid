@@ -32,8 +32,8 @@ CREATE TABLE tx_wowraid_comments (
 	cruser_id int(11) DEFAULT '0' NOT NULL,
 	deleted tinyint(4) DEFAULT '0' NOT NULL,
 	hidden tinyint(4) DEFAULT '0' NOT NULL,
-	raid int(11) NOT NULL,
-	author int(11) NOT NULL,
+	raid int(11) DEFAULT '0' NOT NULL,
+	author int(11) DEFAULT '0' NOT NULL,
 	message text NOT NULL,
 	
 	PRIMARY KEY (uid),
