@@ -5,7 +5,7 @@
   <link rel="stylesheet" type="text/css" href="tx_wowraid_pi1.css" />
 </head>    
 <body>
-<!--------------------------------------------------------------------------------------------------------------------->
+<hr><!----------------------------------------------------------------------------------------------------------------->
 <div class="tx_wowraid_pi1">
 <!-- ###LISTVIEW### begin -->
   <!-- ###FE_USER### begin -->
@@ -16,19 +16,38 @@
       <th class="col1" width="70%">###LLL_NAME###</th>
       <th class="col2" width="0%">###LLL_BEGIN###</th>
       <th class="col3" width="0%">###LLL_INVITE###</th>
-      <th class="col4" width="0%">#</th>
-      <th class="col5" width="30%">###LLL_PARTICIPANTS###</th>
+      <th class="col4" width="30%">###LLL_PARTICIPANTS###</th>
     </tr>
     <!-- ###RAID### begin -->
     <tr>
       <td class="col1" valign="top">###NAME->DETAIL### ###ADMIN###</td>
-      <td class="col2" valign="top">###BEGIN### (###DAYS###)</td>
+      <td class="col2" valign="top">###BEGIN###&nbsp;(###DAYS###)</td>
       <td class="col3" valign="top">###INVITE###</td>
-      <td class="col4" valign="top">###PARTICIPANTS###</td>
-      <td class="col5" valign="top"><table class="tx_wowraid_pi1_list" border="0">
-        <!-- ###PARTICIPANTS_LIST### begin -->
-        <tr><td>###NAME### ###OFFICER###</td></tr>
-        <!-- ###PARTICIPANTS_LIST### end -->
+      <td class="col4" valign="top"><table class="participants" cellpadding="0" cellspacing="0" border="0" valign="top" width="100%">
+        <tr>
+          <td><img width="20px" src="typo3conf/ext/wow_raid/res/gfx/classicons/warrior.png"></td>
+          <td><img width="20px" src="typo3conf/ext/wow_raid/res/gfx/classicons/warlock.png"></td>
+          <td><img width="20px" src="typo3conf/ext/wow_raid/res/gfx/classicons/shaman.png"></td>
+          <td><img width="20px" src="typo3conf/ext/wow_raid/res/gfx/classicons/rogue.png"></td>
+          <td><img width="20px" src="typo3conf/ext/wow_raid/res/gfx/classicons/priest.png"></td>
+          <td><img width="20px" src="typo3conf/ext/wow_raid/res/gfx/classicons/paladin.png"></td>
+          <td><img width="20px" src="typo3conf/ext/wow_raid/res/gfx/classicons/mage.png"></td>
+          <td><img width="20px" src="typo3conf/ext/wow_raid/res/gfx/classicons/hunter.png"></td>
+          <td><img width="20px" src="typo3conf/ext/wow_raid/res/gfx/classicons/druid.png"></td>
+          <td><img width="20px" src="typo3conf/ext/wow_raid/res/gfx/classicons/deathknight.png"></td>
+        </tr>
+        <tr>
+          <td>###PARTICIPANTS_WR###</td>
+          <td>###PARTICIPANTS_WL###</td>
+          <td>###PARTICIPANTS_SH###</td>
+          <td>###PARTICIPANTS_RO###</td>
+          <td>###PARTICIPANTS_PR###</td>
+          <td>###PARTICIPANTS_PA###</td>
+          <td>###PARTICIPANTS_MA###</td>
+          <td>###PARTICIPANTS_HU###</td>
+          <td>###PARTICIPANTS_DR###</td>
+          <td>###PARTICIPANTS_DK###</td>
+        </tr>
       </table></td>
     </tr>
     <!-- ###RAID### begin -->
@@ -40,37 +59,41 @@
   </table>
 <!-- ###LISTVIEW### end -->
 </div>
-<!--------------------------------------------------------------------------------------------------------------------->
+<hr><!----------------------------------------------------------------------------------------------------------------->
 <div class="tx_wowraid_pi1">
 <!-- ###SINGLEVIEW### begin -->
-    ###LLL_NAME###:###NAME###<br/>
-    ###LLL_BEGIN###:###BEGIN###<br/>
-    ###LLL_PREPARE###:###PREPARE###<br/>
-    ###LLL_INVITE###:###INVITE###<br/>
-    <table class="tx_wowraid_pi1_list" border="1">
+    <table class="participants" border="1" cellpadding="0" cellspacing="0">
+      <tr><th>###LLL_NAME###</th><th>###LLL_CLASS###</th><th>###LLL_LEVEL###</th><th>###LLL_RACE###</th></tr>
       <!-- ###PARTICIPANTS_LIST### begin -->
-      <tr><td>###NAME### ###OFFICER###</td></tr>
+      <tr><td>###NAME### ###OFFICER###</td><td>###CLASS###</td><td>###LEVEL###</td><td>###RACE###</td></tr>
       <!-- ###PARTICIPANTS_LIST### end -->
     </table>
+    <p>###LLL_NAME###:###NAME###<br/>###LLL_BEGIN###:###BEGIN###<br/>###LLL_PREPARE###:###PREPARE###<br/>###LLL_INVITE###:###INVITE###</p>
     <!-- ###FE_USER### begin -->
-    <form action="###URL###" method="POST">
-      ###HIDDEN###
-      <select name="###ID_JOIN###">###OPTIONS_CHARS###</select><input type="submit" value="###LLL_JOIN###"/><br/>
-    </form>
-    <form action="###URL###" method="POST">
-      ###HIDDEN###
-      <textarea name="###ID_COMMENT###"></textarea><input type="submit" value="###LLL_COMMENT###"/><br/>
-    </form>
+      <!-- ###IS_NOT_PARTICIPANT### begin -->
+      <form action="###URL###" method="POST">
+        ###HIDDEN###
+        <select name="###ID_JOIN###">###OPTIONS_CHARS###</select><input type="submit" value="###LLL_JOIN###"/><br/>
+      </form>
+      <!-- ###IS_NOT_PARTICIPANT### begin -->
+      <!-- ###IS_PARTICIPANT### begin -->
+      <form action="###URL###" method="POST">
+        ###HIDDEN###
+        <textarea name="###ID_COMMENT###"></textarea><input type="submit" value="###LLL_COMMENT###"/><br/>
+      </form>
+      <!-- ###IS_PARTICIPANT### begin -->
     <!-- ###FE_USER### end -->
-    <table class="tx_wowraid_pi1_comments" border="1">
+    <p>###LLL_COMMENTS###</p>
+    <table class="comments" border="1" cellpadding="0" cellspacing="0">
+      <tr><th valign="top" class="author">###LLL_AUTHOR###</th><th valign="top" class="message">###LLL_MESSAGE###</th></tr>
       <!-- ###COMMENTS### begin -->
-      <tr><td valign="top">###AUTHOR### (###CHARACTER###)<br/>###DATETIME###</td><td valign="top">###MESSAGE###</td></tr>
+      <tr><td valign="top" class="author">###AUTHOR### (###CHARACTER###)<br/>###DATETIME###</td><td valign="top" class="message">###MESSAGE###</td></tr>
       <!-- ###COMMENTS### end -->
     </table>
     <a href="###URL###"><input type="button" value="###LLL_BACK###"/></a>
 <!-- ###SINGLEVIEW### end -->
 </div>
-<!--------------------------------------------------------------------------------------------------------------------->
+<hr><!----------------------------------------------------------------------------------------------------------------->
 <div class="tx_wowraid_pi1">
 <!-- ###CREATE### begin -->
   <!-- ###FE_USER### begin -->
@@ -90,7 +113,7 @@
   <!-- ###NO_USER### end -->
 <!-- ###CREATE### end -->
 </div>
-<!--------------------------------------------------------------------------------------------------------------------->
+<hr><!----------------------------------------------------------------------------------------------------------------->
 <div class="tx_wowraid_pi1">
 <!-- ###EDIT### begin -->
   <form action="###URL###" method="POST">
@@ -107,12 +130,6 @@
     <input type="submit" value="###LLL_SUBMIT###"/>
   </form>
 <!-- ###EDIT### end -->
-</div>
-<!--------------------------------------------------------------------------------------------------------------------->
-<div class="tx_wowraid_pi1">
-<!-- ###ERROR### begin -->
-<div class="tx_wowraid_pi1_error">###ERROR_MSG###</div>
-<!-- ###ERROR### end -->
 </div>
 <!--------------------------------------------------------------------------------------------------------------------->
 </body>

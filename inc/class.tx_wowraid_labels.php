@@ -1,12 +1,13 @@
 <?php
 require_once(PATH_t3lib.'class.t3lib_befunc.php');
-require_once(t3lib_extMgm::extPath("wow_raid")."class.tx_wowraid_instances.php");
+require_once(t3lib_extMgm::extPath("wow_raid")."inc/class.tx_wowraid_instances.php");
 
 /* append this to your tca.php *****************************************************************************************
 
 if( (TYPO3_MODE=="BE") && (t3lib_div::int_from_ver(TYPO3_version) >= 4001000) ){
-  require_once(t3lib_extMgm::extPath('wow_raid').'class.tx_wowraid_labels.php');
+  require_once(t3lib_extMgm::extPath('wow_raid').'inc/class.tx_wowraid_labels.php');
   $TCA['tx_wowraid_raids']['ctrl']['label_userFunc'] = "tx_wowraid_labels->getRaidLabel";// list view
+  $TCA['tx_wowraid_comments']['ctrl']['label_userFunc'] = "tx_wowraid_labels->getCommentLabel";// list view
   $TCA["tx_wowraid_raids"]["columns"]["instance"]["config"]["itemsProcFunc"] = "tx_wowraid_labels->getRaidList";// edit view
 }
 
@@ -17,7 +18,7 @@ class tx_wowraid_labels{
   private $instances = null;
   
   function tx_wowraid_labels(){
-    $this->instances = new tx_wowraid_instances('../typo3temp/');
+    $this->instances = new tx_wowraid_instances();
   }
   
   function getRaidLabel(&$params, &$pObj) {
@@ -47,4 +48,4 @@ class tx_wowraid_labels{
   }
   
 }
-?>
+?> 
