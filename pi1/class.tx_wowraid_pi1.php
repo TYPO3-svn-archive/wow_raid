@@ -56,6 +56,8 @@ class tx_wowraid_pi1 extends tslib_pibase {
     $GLOBALS['TYPO3_DB']->debugOutput = false;
     $this->instances = new tx_wowraid_instances();
     
+    $GLOBALS['TSFE']->additionalHeaderData[$this->extKey] = '<link rel="stylesheet" href="'.$this->conf['css'].'" type="text/css" />';
+    
     //$raids = new tx_wowraid_raids(12);
     
     /* ACTIONS */

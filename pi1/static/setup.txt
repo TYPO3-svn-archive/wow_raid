@@ -6,6 +6,7 @@ plugin.tx_wowraid_pi1 {
       template.file = {$plugin.tx_wowraid_pi1.template.html}
     }
   }
+  css = typo3conf/ext/wow_raid/pi1/tx_wowraid_pi1.css
 }
 plugin.tx_wowraid_pi1.listView {
 }
@@ -14,9 +15,4 @@ plugin.tx_wowraid_pi1.singleview{
 plugin.tx_wowraid_pi1.create{
 }
 plugin.tx_wowraid_pi1.edit{
-}
-
-plugin.tx_wowraid_pi1._CSS_DEFAULT_STYLE = @import url("../typo3conf/ext/wow_raid/pi1/tx_wowraid_pi1.css");
-
-plugin.tx_wowraid_pi1._LOCAL_LANG.default {
 }
