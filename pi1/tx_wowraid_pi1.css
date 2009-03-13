@@ -2,6 +2,7 @@
 .tx-wowraid-pi1 {}
 
 .tx-wowraid-pi1 .participants {width:70%;float:right;}
+.tx-wowraid-pi1 .participants td {padding: 0 2px;text-align: center;}
 
 .tx-wowraid-pi1 .comments {width:100%;clear:both;}
 .tx-wowraid-pi1 .comments .author {width:20%;}

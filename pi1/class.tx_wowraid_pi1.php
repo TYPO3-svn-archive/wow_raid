@@ -25,7 +25,7 @@
 require_once(PATH_tslib.'class.tslib_pibase.php');
 require_once(t3lib_extMgm::extPath('wow_raid').'inc/class.tx_wowraid_instances.php');
 require_once(t3lib_extMgm::extPath('wow_raid').'inc/class.tx_wowraid_raids.php');
-require_once(t3lib_extMgm::extPath('wow_character').'pi1/class.tx_wowcharacter_pi1_character.php');
+require_once(t3lib_extMgm::extPath('wow_character').'inc/class.tx_wowcharacter_character.php');
 
 /**
  * Plugin 'WOW Raids' for the 'wow_raid' extension.
