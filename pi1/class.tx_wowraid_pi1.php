@@ -23,8 +23,9 @@
 ***************************************************************/
 
 require_once(PATH_tslib.'class.tslib_pibase.php');
-require_once(t3lib_extMgm::extPath('wow_raid').'inc/class.tx_wowraid_instances.php' );
-require_once(t3lib_extMgm::extPath('wow_raid').'inc/class.tx_wowraid_raids.php' );
+require_once(t3lib_extMgm::extPath('wow_raid').'inc/class.tx_wowraid_instances.php');
+require_once(t3lib_extMgm::extPath('wow_raid').'inc/class.tx_wowraid_raids.php');
+require_once(t3lib_extMgm::extPath('wow_character').'pi1/class.tx_wowcharacter_pi1_character.php');
 
 /**
  * Plugin 'WOW Raids' for the 'wow_raid' extension.
@@ -54,9 +55,9 @@ class tx_wowraid_pi1 extends tslib_pibase {
     $this->pi_initPIflexForm();
     if(!( $this->conf['pid'] = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'raids_folder', 'sDEF') )) throw new Exception('No start folder defined!');
     $GLOBALS['TYPO3_DB']->debugOutput = false;
-    $this->instances = new tx_wowraid_instances();
-    
+    $this->instances = new tx_wowraid_instances();    
     $GLOBALS['TSFE']->additionalHeaderData[$this->extKey] = '<link rel="stylesheet" href="'.$this->conf['css'].'" type="text/css" />';
+    $view = $this->piVars['view'];
     
     //$raids = new tx_wowraid_raids(12);
     
@@ -76,7 +77,7 @@ class tx_wowraid_pi1 extends tslib_pibase {
     $marker['###URL###'] = $this->pi_linkTP_keepPIvars_url(array(),0,1);
     $marker['###NEW###'] = $this->pi_linkTP_keepPIvars($marker['###LLL_NEW###'],array('view'=>'create'));
     /* VIEWS */
-    switch($this->piVars['view']){
+    switch($view){
       case'detail': $tpl = $this->singleView($tpl); break;
       case'create': $tpl = $this->createView($tpl); break;
       case'edit':   $tpl = $this->editView($tpl); break;
@@ -266,7 +267,7 @@ class tx_wowraid_pi1 extends tslib_pibase {
       $marker['###INVITE###'] = date('d.m.Y H:i',$data['begin']-($data['prepare']*60));
       $marker['###PARTICIPANTS###'] = count(explode(',',$data['participants']));
       $marker['###ADMIN###'] = $this->createAdmin($data);
-      $marker = array_merge($marker,$this->marksParticipants());
+      $marker = array_merge($marker,$this->marksParticipants($data['participants']));
       if( $tpl_participant = $this->cObj->getSubpart($tpl,'###PARTICIPANTS_LIST###') ){
         $tmp = $this->createParticipantList($tpl_participant,$data['participants'],$officer);// create list of participants
         $tpl = $this->cObj->substituteSubpart($tpl,'###PARTICIPANTS_LIST###',$tmp);// substitute list
@@ -315,12 +316,18 @@ class tx_wowraid_pi1 extends tslib_pibase {
   * @desc Fill a given template with data for a single participant.
   */
   function createParticipantSingle($tpl,$row,$officer=false){
+    $char = new tx_wowcharacter_pi1_character($row['realm'],$row['name']);
+    $char = $char->xml->characterInfo;
     $marker = array();
     $marker['###NAME###'] = $row['name'];
     $marker['###REALM###'] = $row['realm'];
-    $marker['###OFFICER###'] = '';
+    $marker['###CLASS###'] = $char->character['class'];
+    $marker['###LEVEL###'] = $char->character['level'];
+    $marker['###RACE###'] = $char->character['race'];
+    $marker['###GUILD###'] = $char->character['guildName'];
+    $marker['###ICON_OFFICER###'] = '';
     if($officer){
-      // ???
+      $marker['###ICON_OFFICER###'] = '<img src="typo3conf/ext/wow_raid/res/gfx/crown.png">';
     }
     return $this->cObj->substituteMarkerArray($tpl,$marker);
   }
@@ -349,8 +356,8 @@ class tx_wowraid_pi1 extends tslib_pibase {
     return $tmp;
   }
   
-  function marksParticipants(){
-    return array(
+  function marksParticipants($participants){
+    $result = array(
       '###PARTICIPANTS_WR###' => 0,
       '###PARTICIPANTS_WL###' => 0,
       '###PARTICIPANTS_SH###' => 0,
@@ -362,6 +369,15 @@ class tx_wowraid_pi1 extends tslib_pibase {
       '###PARTICIPANTS_DR###' => 0,
       '###PARTICIPANTS_DK###' => 0,
     );
+    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('realm,name','tx_wowcharacter_characters','uid IN ('.$participants.')','','name');
+    while( $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res) ){
+      $char = new tx_wowcharacter_pi1_character($row['realm'],$row['name']);
+      $char = $char->xml->characterInfo;
+      switch(intval($char->character['classId'])){
+        case 9: $result['###PARTICIPANTS_WL###']++; break;
+      }
+    }
+    return $result;
   }
   
 }

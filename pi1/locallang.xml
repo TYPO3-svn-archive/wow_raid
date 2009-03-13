@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <T3locallang>
-	<meta type="array">
-		<type>module</type>
-		<description>Language labels for plugin &quot;tx_wowraid_pi1&quot;</description>
-	</meta>
-	<data type="array">
-		<languageKey index="default" type="array">
-			<label index="name">Instance</label>
-			<label index="begin">Begin</label>
-			<label index="prepare">Preparetime</label>
+  <meta type="array">
+    <type>module</type>
+    <description>Language labels for plugin &quot;tx_wowraid_pi1&quot;</description>
+  </meta>
+  <data type="array">
+    <languageKey index="default" type="array">
+      <label index="name">Instance</label>
+      <label index="begin">Begin</label>
+      <label index="prepare">Preparetime</label>
       <label index="participants">Participants</label>
       <label index="invite">Invite</label>
       <label index="back">Back</label>
@@ -20,7 +20,13 @@
       <label index="join">Join</label>
       <label index="noraids">no raids available</label>
       <label index="nouser">Please login!</label>
-			<label index="comment">comment</label>
-		</languageKey>
-	</data>
+      <label index="comment">Comment</label>
+      <label index="comments">Comments</label>
+      <label index="author">Author</label>
+      <label index="message">Message</label>
+      <label index="class">Class</label>
+      <label index="level">Level</label>
+      <label index="race">Race</label>
+    </languageKey>
+  </data>
 </T3locallang>
