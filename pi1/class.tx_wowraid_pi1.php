@@ -316,7 +316,7 @@ class tx_wowraid_pi1 extends tslib_pibase {
   * @desc Fill a given template with data for a single participant.
   */
   function createParticipantSingle($tpl,$row,$officer=false){
-    $char = new tx_wowcharacter_pi1_character($row['realm'],$row['name']);
+    $char = new tx_wowcharacter_character($row['realm'],$row['name']);
     $char = $char->xml->characterInfo;
     $marker = array();
     $marker['###NAME###'] = $row['name'];
@@ -371,10 +371,19 @@ class tx_wowraid_pi1 extends tslib_pibase {
     );
     $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('realm,name','tx_wowcharacter_characters','uid IN ('.$participants.')','','name');
     while( $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res) ){
-      $char = new tx_wowcharacter_pi1_character($row['realm'],$row['name']);
+      $char = new tx_wowcharacter_character($row['realm'],$row['name']);
       $char = $char->xml->characterInfo;
       switch(intval($char->character['classId'])){
-        case 9: $result['###PARTICIPANTS_WL###']++; break;
+        case CLASSID_WR: $result['###PARTICIPANTS_WR###']++; break;
+        case CLASSID_WL: $result['###PARTICIPANTS_WL###']++; break;
+        case CLASSID_SH: $result['###PARTICIPANTS_SH###']++; break;
+        case CLASSID_RO: $result['###PARTICIPANTS_RO###']++; break;
+        case CLASSID_PR: $result['###PARTICIPANTS_PR###']++; break;
+        case CLASSID_PA: $result['###PARTICIPANTS_PA###']++; break;
+        case CLASSID_MA: $result['###PARTICIPANTS_MA###']++; break;
+        case CLASSID_HU: $result['###PARTICIPANTS_HU###']++; break;
+        case CLASSID_DR: $result['###PARTICIPANTS_DR###']++; break;
+        case CLASSID_DK: $result['###PARTICIPANTS_DK###']++; break;
       }
     }
     return $result;
