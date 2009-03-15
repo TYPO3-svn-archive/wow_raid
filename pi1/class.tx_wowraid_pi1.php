@@ -56,7 +56,8 @@ class tx_wowraid_pi1 extends tslib_pibase {
     if(!( $this->conf['pid'] = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'raids_folder', 'sDEF') )) throw new Exception('No start folder defined!');
     $GLOBALS['TYPO3_DB']->debugOutput = false;
     $this->instances = new tx_wowraid_instances();    
-    $GLOBALS['TSFE']->additionalHeaderData[$this->extKey] = '<link rel="stylesheet" href="'.$this->conf['css'].'" type="text/css" />';
+    $GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'0'] = '<link rel="stylesheet" href="'.$this->conf['css'].'" type="text/css" />';
+    $GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'1'] = '<link rel="alternate" type="application/rss+xml" title="RSS" href="'.'http://'.$_SERVER['HTTP_HOST'].'/'.$_SERVER['SCRIPT_NAME'].'?type=99" />';
     $view = $this->piVars['view'];
     
     //$raids = new tx_wowraid_raids(12);
@@ -84,6 +85,38 @@ class tx_wowraid_pi1 extends tslib_pibase {
     }
     return $this->pi_wrapInBaseClass($this->cObj->substituteMarkerArray($tpl,$marker));
 	}
+  
+  function rss($content,$conf){
+    $this->instances = new tx_wowraid_instances();    
+    //phpinfo();die();
+    $xml = new SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><rss version="2.0"></rss>');
+    $channel = $xml->addChild('channel');
+    $channel->addChild('title','Raids RSS');
+    $channel->addChild('link','http://www.jobesoft.de/');
+    $channel->addChild('description','kurze beschreibung');
+    $channel->addChild('language','de-de');
+    $channel->addChild('copyright','jobe');
+    $channel->addChild('pubDate',date('d.m.Y H:i:s'));
+    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*','tx_wowraid_raids','');
+    while( $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res) ){
+      //$link = 'http://'.$_SERVER['HTTP_HOST'].'/t3selma/index.php?id=11&tamp;x_wowraid_pi1[view]=detail&amp;tx_wowraid_pi1[uid]=1';
+      $link = 'http://'.$_SERVER['HTTP_HOST'].'/'.$_SERVER['SCRIPT_NAME'];
+      $dungeon = $this->instances->getInstance($row['instance']);
+      $item = $channel->addChild('item');
+      $item->addChild('title',$dungeon['name']);
+      $item->addChild('description',sprintf(
+        'BEGIN: %s<br>PREPARE: %d<br>PARTICIPANTS: %s',
+        date('d.m.Y H:i',$row['begin']),
+        $row['prepare'],
+        $row['participants']
+      ));
+      $item->addChild('link',$link);
+      $item->addChild('author',$row['instance']);
+      $item->addChild('guid',$row['uid']);
+      $item->addChild('pubDate',date('d.m.Y H:i:s',$row['crdate']));
+    }
+    return $xml->asXML();
+  }
   
   /**
   * @desc Substitute markers and subparts in a template. Markers with sub-markers represent subparts.
