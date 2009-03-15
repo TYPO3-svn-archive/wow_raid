@@ -1,0 +1,4 @@
+plugin.tx_wowraid_pi1 {
+  #cat=plugin.tx_wowraid_pi1/other/a; type=int; label=charviewPID: PID of page to display character.
+  charviewPID =
+}

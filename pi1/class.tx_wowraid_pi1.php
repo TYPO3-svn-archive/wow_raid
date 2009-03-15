@@ -75,7 +75,6 @@ class tx_wowraid_pi1 extends tslib_pibase {
     if(!count($LOCAL_LANG))$LOCAL_LANG = $this->LOCAL_LANG['default'];// fallback to default language
     $marker = array();foreach( $LOCAL_LANG as $key => $value )$marker[sprintf('###LLL_%s###',strtoupper($key))] = $value;// build label array
     $marker['###URL###'] = $this->pi_linkTP_keepPIvars_url(array(),0,1);
-    $marker['###NEW###'] = $this->pi_linkTP_keepPIvars($marker['###LLL_NEW###'],array('view'=>'create'));
     /* VIEWS */
     switch($view){
       case'detail': $tpl = $this->singleView($tpl); break;
@@ -125,6 +124,8 @@ class tx_wowraid_pi1 extends tslib_pibase {
       'participants' => $participants
     ));/**/
     unset($this->piVars['join']);
+    $this->piVars['comment'] = '@JOINED';
+    $this->actionComment();
   }
 
   /**
@@ -137,6 +138,7 @@ class tx_wowraid_pi1 extends tslib_pibase {
     ));
     //TODO: notify participants
     //TODO: release participants
+    //TODO: clear comments
     unset($this->piVars['delete']);
   }
 
@@ -150,9 +152,9 @@ class tx_wowraid_pi1 extends tslib_pibase {
       'begin' => strtotime($this->piVars['edit']['begin']),
       'prepare' => $this->piVars['edit']['prepare']
     ));
-    //TODO: notify participants
-    //TODO: release participants
     unset($this->piVars['edit']);
+    $this->piVars['comment'] = '@MODIFIED';
+    $this->actionComment();
   }
   
   /**
@@ -167,9 +169,12 @@ class tx_wowraid_pi1 extends tslib_pibase {
       'instance' => $this->piVars['create']['instance'],
       'begin' => strtotime($this->piVars['create']['begin']),
       'prepare' => $this->piVars['create']['prepare'],
-      'participants' => $this->piVars['create']['officer']
+      'participants' => $this->piVars['create']['officer'],
     ));
     unset($this->piVars['create']);
+    $this->piVars['uid'] = $GLOBALS['TYPO3_DB']->sql_insert_id();
+    $this->piVars['comment'] = '@CREATED';
+    $this->actionComment();
   }
 
   function actionComment(){
@@ -182,7 +187,7 @@ class tx_wowraid_pi1 extends tslib_pibase {
       'crdate' => time(),
       'raid' => $uid,
       'author' => $author,
-      'message' => $comment
+      'message' => $comment,
     ));
     unset($this->piVars['comment']);
   }
@@ -200,7 +205,8 @@ class tx_wowraid_pi1 extends tslib_pibase {
     }else{
       $tpl = $this->cObj->substituteSubpart($tpl,'###RAID###','');
       $tpl = $this->cObj->substituteSubpart($tpl,'###EMPTY###',$tpl_empty);
-    }  
+    }
+    $tpl = $this->substituteSubpart($tpl,'###CAN_CREATE###',$this->canCreate());
     return $tpl;
 	}
   
@@ -259,10 +265,10 @@ class tx_wowraid_pi1 extends tslib_pibase {
       $dungeon = $this->instances->getInstance($data['instance']);
       $officer = array_shift(explode(',',$data['participants']));
       $marker['###HIDDEN###'] .= sprintf("<input type='hidden' name='tx_wowraid_pi1[uid]' value='%d'>\n",$data['uid']);
-      $marker['###NAME###'] = $dungeon['name'];
-      $marker['###NAME->DETAIL###'] = $this->pi_linkTP_keepPIvars($marker['###NAME###'],array('view'=>'detail','uid'=>$data['uid']));
+      $marker['###INSTANCE###'] = $dungeon['name'];
+      $marker['###INSTANCE->DETAIL###'] = $this->pi_linkTP_keepPIvars($marker['###INSTANCE###'],array('view'=>'detail','uid'=>$data['uid']));
       $marker['###BEGIN###'] = date('d.m.Y H:i',$data['begin']);
-      $marker['###DAYS###'] = intval( ( $data['begin'] - time() ) / 60 / 60 / 60 );
+      $marker['###DAYS###'] = round( ( $data['begin'] - time() ) / 60 / 60 / 24 );
       $marker['###PREPARE###'] = $data['prepare'];
       $marker['###INVITE###'] = date('d.m.Y H:i',$data['begin']-($data['prepare']*60));
       $marker['###PARTICIPANTS###'] = count(explode(',',$data['participants']));
@@ -273,32 +279,41 @@ class tx_wowraid_pi1 extends tslib_pibase {
         $tpl = $this->cObj->substituteSubpart($tpl,'###PARTICIPANTS_LIST###',$tmp);// substitute list
       }
     }
-    if( $GLOBALS['TSFE']->fe_user->user && $tpl_feuser = $this->cObj->getSubpart($tpl,'###FE_USER###') ){// fill markers for fe_users
-      $wowchars = $GLOBALS['TSFE']->fe_user->user["tx_wowcharacter_wowchars"];
-      $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*','tx_wowcharacter_characters',sprintf('uid IN (%s) AND hidden = 0 AND deleted = 0',$wowchars));
-      while( $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res) )
-        $marker['###OPTIONS_CHARS###'] .= sprintf("<option value='%d'>%s</option>\n",$row['uid'],$row['name']);
-      $tpl_feuser = $this->cObj->substituteMarkerArray($tpl_feuser,$marker);
-    }elseif( $tpl_nouser = $this->cObj->getSubpart($tpl,'###NO_USER###') ){
-      $tpl_nouser = $this->cObj->substituteMarkerArray($tpl_nouser,$marker);
-    }
+    
+    if( ( $submarker = $this->canJoin() )
+    &&  ( $tpl_can_join = $this->cObj->getSubpart($tpl,'###CAN_JOIN###') )
+    )$tpl_can_join = $this->cObj->substituteMarkerArray($tpl_can_join,array_merge($marker,$submarker));
+    
+    if( ( $submarker = $this->canComment($GLOBALS['TSFE']->fe_user->user,$data['participants']) )
+    &&  ( $tpl_can_comment = $this->cObj->getSubpart($tpl,'###CAN_COMMENT###') )
+    )$tpl_can_comment = $this->cObj->substituteMarkerArray($tpl_can_comment,array_merge($marker,$submarker));
+    
     if( $tpl_comments = $this->cObj->getSubpart($tpl,'###COMMENTS###') ){
-      $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*','tx_wowraid_comments',sprintf('raid = %d',$data['uid'])); unset($tmp);
+      $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*','tx_wowraid_comments',sprintf('raid = %d',$data['uid']),'','crdate'); unset($tmp);
       while( $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res) ){
         $row['author'] = $this->pi_getRecord('fe_users',$row['author']);
         $row['character'] = array_shift(array_intersect(explode(',',$data['participants']),explode(',',$row['author']['tx_wowcharacter_wowchars'])));
         $row['character'] = $this->pi_getRecord('tx_wowcharacter_characters',$row['character']);
         $row['character'] = $row['character']['name'];
+        unset($css);switch($row['message']){// parse system messages
+          case '@CREATED': $row['message'] = $this->pi_getLL('system.raid.created'); $css = 'system'; break;
+          case '@MODIFIED': $row['message'] = $this->pi_getLL('system.raid.modified'); $css = 'system'; break;
+          case '@JOINED': $row['message'] = $this->pi_getLL('system.raid.joined'); $css = 'system'; break;
+          case '@LEFT': $row['message'] = $this->pi_getLL('system.raid.left'); $css = 'system'; break;
+        };
         $tmp .= $this->cObj->substituteMarkerArray($tpl_comments,array(
           '###DATETIME###' => date('m.d.Y H:i',$row['crdate']),
           '###AUTHOR###' => $row['author']['username'],
           '###CHARACTER###' => $row['character'],
-          '###MESSAGE###' => $row['message']
+          '###MESSAGE###' => $row['message'],
+          '###CSS###' => $css,
         ));
       }
       $tpl_comments = $tmp;
     }
-    $tpl = $this->cObj->substituteSubpart($tpl,'###FE_USER###',$tpl_feuser);// subtitute fe_user part
+    
+    $tpl = $this->cObj->substituteSubpart($tpl,'###CAN_JOIN###',$tpl_can_join);
+    $tpl = $this->cObj->substituteSubpart($tpl,'###CAN_COMMENT###',$tpl_can_comment);
     $tpl = $this->cObj->substituteSubpart($tpl,'###NO_USER###',$tpl_nouser);// subtitute no_user part
     $tpl = $this->cObj->substituteSubpart($tpl,'###COMMENTS###',$tpl_comments);// subtitute comments part
     return $this->cObj->substituteMarkerArray($tpl,$marker);
@@ -316,15 +331,7 @@ class tx_wowraid_pi1 extends tslib_pibase {
   * @desc Fill a given template with data for a single participant.
   */
   function createParticipantSingle($tpl,$row,$officer=false){
-    $char = new tx_wowcharacter_character($row['realm'],$row['name']);
-    $char = $char->xml->characterInfo;
-    $marker = array();
-    $marker['###NAME###'] = $row['name'];
-    $marker['###REALM###'] = $row['realm'];
-    $marker['###CLASS###'] = $char->character['class'];
-    $marker['###LEVEL###'] = $char->character['level'];
-    $marker['###RACE###'] = $char->character['race'];
-    $marker['###GUILD###'] = $char->character['guildName'];
+    $marker = $this->getCharacter($row['uid']);
     $marker['###ICON_OFFICER###'] = '';
     if($officer){
       $marker['###ICON_OFFICER###'] = '<img src="typo3conf/ext/wow_raid/res/gfx/crown.png">';
@@ -387,6 +394,92 @@ class tx_wowraid_pi1 extends tslib_pibase {
       }
     }
     return $result;
+  }
+
+  /* QUESTIONS ********************************************************************************************************/
+
+  /**
+  * @desc Return markers for subpart if user is allowed to join a raid.
+  */
+  private function canJoin(){
+    if(empty($GLOBALS['TSFE']->fe_user->user))return null;
+    $wowchars = $GLOBALS['TSFE']->fe_user->user["tx_wowcharacter_wowchars"];
+    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*','tx_wowcharacter_characters',sprintf('uid IN (%s) AND hidden = 0 AND deleted = 0',$wowchars));
+    while( $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res) )
+      $marker['###OPTIONS_CHARS###'] .= sprintf("<option value='%d'>%s</option>\n",$row['uid'],$row['name']);
+    return $marker;  
+  }
+  
+  /**
+  * @desc Return markers for subpart if user is allowed to comment a raid.
+  */
+  private function canComment($author,$participants){
+    if(empty($author))return null;
+    $author = $this->getAuthor($author,$participants);
+    if(empty($author['character']))return null;
+    $result = array(
+      '###AUTHOR###' => $author['username'],
+      '###CHARACTER###' => $author['character']['name'],
+    );
+    return $result;
+  }
+
+  /**
+  * @desc Return markers for subpart if user can create raids.
+  */
+  private function canCreate(){
+    if(empty($GLOBALS['TSFE']->fe_user->user))return null;
+    $marker[0]['###NEW###'] = $this->pi_linkTP_keepPIvars($this->pi_getLL('new'),array('view'=>'create'));
+    return $marker;
+  }
+  
+  /* OTHER ************************************************************************************************************/
+
+  private function getAuthor($author,$participants){
+    $author['character'] = array_shift(array_intersect(explode(',',$participants),explode(',',$author['tx_wowcharacter_wowchars'])));
+    $author['character'] = $this->pi_getRecord('tx_wowcharacter_characters',$author['character']);
+    return $author;
+  }
+  
+  private function getCharacter($uid){
+    $char = $this->pi_getRecord('tx_wowcharacter_characters',$uid);
+    $char['info'] = new tx_wowcharacter_character($char['realm'],$char['name']);
+    $char['info'] = $char['info']->xml->characterInfo;
+    $marker = array();
+    $marker['###NAME###'] = $char['name'];
+    if($this->conf['charviewPID'])$marker['###NAME###'] = $this->pi_linkToPage(
+      $marker['###NAME###'],
+      $this->conf['charviewPID'],
+      null,
+      array('tx_wowcharacter_pi1[id]'=>$char['uid'])
+    );// ?id=<page>&tx_wowcharacter_pi1[id]=<char>
+    $marker['###REALM###']  = $char['realm'];
+    $marker['###CLASS###']  = strval($char['info']->character['class']);
+    $marker['###LEVEL###']  = intval($char['info']->character['level']);
+    $marker['###RACE###']   = strval($char['info']->character['race']);
+    $marker['###GUILD###']  = strval($char['info']->character['guildName']);
+    $marker['###SKILL###']  = sprintf(
+      '%02d/%02d/%02d',
+      $char['info']->characterTab->talentSpec['treeOne'],
+      $char['info']->characterTab->talentSpec['treeTwo'],
+      $char['info']->characterTab->talentSpec['treeThree']
+    );
+    return $marker;
+  }
+
+  /**
+  * @desc Substitute a subpart. 
+  * @param (string) source template
+  * @param (string) subpart ID
+  * @param (array)  list of arrays each representing a set of markers
+  * @param (array)  global markers
+  */
+  private function substituteSubpart($tpl,$subpart,$submarker,$marker=array()){
+    if( $submarker )// if submarker given 
+      if( $tpl_sub = $this->cObj->getSubpart($tpl,$subpart) )// and subpart present
+        foreach( $submarker as $num => $singlemarker )
+          $tmp .= $this->cObj->substituteMarkerArray($tpl_sub,array_merge($marker,$singlemarker));// parse template
+    return $this->cObj->substituteSubpart($tpl,$subpart,$tmp);
   }
   
 }

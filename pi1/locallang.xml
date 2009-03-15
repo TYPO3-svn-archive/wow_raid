@@ -6,27 +6,64 @@
   </meta>
   <data type="array">
     <languageKey index="default" type="array">
-      <label index="name">Instance</label>
+      <label index="instance">Instance</label>
       <label index="begin">Begin</label>
       <label index="prepare">Preparetime</label>
+      <label index="days">Days</label>
       <label index="participants">Participants</label>
       <label index="invite">Invite</label>
       <label index="back">Back</label>
       <label index="admin">Admin</label>
-      <label index="new">Create new Raid...</label>
+      <label index="new">create new raid</label>
       <label index="submit">OK</label>
       <label index="cancel">CANCEL</label>
       <label index="officer">Officer</label>
-      <label index="join">Join</label>
       <label index="noraids">no raids available</label>
       <label index="nouser">Please login!</label>
-      <label index="comment">Comment</label>
+      <label index="join">join with:</label>
+      <label index="comment">comment only</label>
       <label index="comments">Comments</label>
       <label index="author">Author</label>
       <label index="message">Message</label>
+      <label index="name">Name</label>
       <label index="class">Class</label>
       <label index="level">Level</label>
       <label index="race">Race</label>
+      <label index="skill">Skill</label>
+      <label index="system.raid.created">created a new raid.</label>
+      <label index="system.raid.modified">raid modified.</label>
+      <label index="system.raid.joined">joined raid.</label>
+      <label index="system.raid.left">left raid.</label>
+    </languageKey>
+    <languageKey index="de" type="array">
+      <label index="instance">Instanz</label>
+      <label index="begin">Startzeit</label>
+      <label index="prepare">Vorbereitung</label>
+      <label index="days">Tage</label>
+      <label index="participants">Teilnehmer</label>
+      <label index="invite">Einladung</label>
+      <label index="back">Zurück</label>
+      <label index="admin">Admin</label>
+      <label index="new">Neuer Raid</label>
+      <label index="submit">OK</label>
+      <label index="cancel">CANCEL</label>
+      <label index="officer">Raidleiter</label>
+      <label index="noraids">Keine Raids verfügbar!</label>
+      <label index="nouser">Bitte anmelden!</label>
+      <label index="join">Teilnehmen mit:</label>
+      <label index="comment">Kommentar</label>
+      <label index="comments">Kommentare</label>
+      <label index="author">Author</label>
+      <label index="message">Nachricht</label>
+      <label index="name">Name</label>
+      <label index="class">Klasse</label>
+      <label index="level">Level</label>
+      <label index="race">Rasse</label>
+      <label index="skill">Skill</label>
+      <label index="system.raid.created">hat einen neuen Raid erstellt.</label>
+      <label index="system.raid.modified">Raid modifiziert.</label>
+      <label index="system.raid.joined">ist dem Raid beigetreten.</label>
+      <label index="system.raid.left">hat den Raid verlassen.</label>
     </languageKey>
   </data>
 </T3locallang>

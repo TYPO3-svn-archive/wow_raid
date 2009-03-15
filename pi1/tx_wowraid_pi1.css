@@ -1,12 +1,37 @@
 
 .tx-wowraid-pi1 {}
 
-.tx-wowraid-pi1 .participants {width:70%;float:right;}
-.tx-wowraid-pi1 .participants td {padding: 0 2px;text-align: center;}
+.tx-wowraid-pi1 .listview th {border-bottom: 1px solid;text-align: left; vertical-align: bottom;}
+.tx-wowraid-pi1 .listview th span {font-weight: normal; font-size: 75%;}
+.tx-wowraid-pi1 .listview th span img {height:10px;}
+.tx-wowraid-pi1 .listview td {border-bottom: 1px dotted; padding: 5px 5px 0 0;}
+.tx-wowraid-pi1 .listview .col1 {}
+.tx-wowraid-pi1 .listview .col2,
+.tx-wowraid-pi1 .listview .col3 {width:85px;}
+.tx-wowraid-pi1 .listview .col4 {width:240px;}
+.tx-wowraid-pi1 .listview .participants td {padding: 0 2px; text-align: center; border: 0;}
 
-.tx-wowraid-pi1 .comments {width:100%;clear:both;}
-.tx-wowraid-pi1 .comments .author {width:20%;}
-.tx-wowraid-pi1 .comments .message {width:80%;}
+.tx-wowraid-pi1 .singleview {}
+.tx-wowraid-pi1 .singleview h2 {clear:both;}
+.tx-wowraid-pi1 .singleview dl {margin: 0 0 15px 0;}
+.tx-wowraid-pi1 .singleview dl dt {float:left;width:80px;font-weight: bold;}
+.tx-wowraid-pi1 .singleview dl dd {}
+.tx-wowraid-pi1 .singleview .participants {width:50%;float:right;}
+.tx-wowraid-pi1 .singleview .participants th {border-bottom: 1px solid;}
+.tx-wowraid-pi1 .singleview .comments {width:100%;clear:both;}
+.tx-wowraid-pi1 .singleview .comments th {border-bottom: 1px solid;}
+.tx-wowraid-pi1 .singleview .comments td {border-bottom: 1px dotted;vertical-align: top;}
+.tx-wowraid-pi1 .singleview .comments textarea {width:100%}
+.tx-wowraid-pi1 .singleview .comments input {float:right;}
+.tx-wowraid-pi1 .singleview .comments .system .message {font-style: italic;}
+.tx-wowraid-pi1 .singleview .comments .author {width:20%;}
+.tx-wowraid-pi1 .singleview .comments .message {width:80%;}
+
+.tx-wowraid-pi1 .create {width:290px;padding:5px;border: 1px dotted;}
+.tx-wowraid-pi1 .create lable {float:left;width:80px;}
+.tx-wowraid-pi1 .create select,
+.tx-wowraid-pi1 .create input {width:200px;}
+.tx-wowraid-pi1 .create input.button {width:49%;}
 
 .tx_wowraid_pi1_list {}
 .tx_wowraid_pi1_list td {font-size:12px;}
