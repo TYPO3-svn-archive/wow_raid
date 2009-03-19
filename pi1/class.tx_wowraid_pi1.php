@@ -179,6 +179,9 @@ class tx_wowraid_pi1 extends tslib_pibase {
   * @desc Modify a given raid.
   */
   function actionEdit(){
+    // plausibility check
+    if( strtotime($this->piVars['edit']['begin']) < time() )return null;
+    if(empty($this->piVars['edit']['instance']))return null;
     $res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_wowraid_raids',sprintf('uid = %d',$this->piVars['uid']),array(
       'tstamp' => time(),
       'instance' => $this->piVars['edit']['instance'],
@@ -194,6 +197,10 @@ class tx_wowraid_pi1 extends tslib_pibase {
   * @desc Create a new raid
   */
   function actionCreate(){
+    // plausibility check
+    if( strtotime($this->piVars['create']['begin']) < time() )return null;
+    if(empty($this->piVars['create']['instance']))return null;
+    if(empty($this->piVars['create']['officer']))return null;
     $res = $GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_wowraid_raids',array(
       'pid' => $this->conf['pid'],
       'tstamp' => time(),
@@ -263,7 +270,8 @@ class tx_wowraid_pi1 extends tslib_pibase {
     $marker['###ID_OFFICER###']   = "tx_wowraid_pi1[create][officer]";
     foreach( $this->instances->dungeons as $dungeonID => $dungeon )
       $marker['###OPTIONS_INSTANCE###'] .= sprintf("<option value='%d'>%s</option>\n",$dungeonID,$dungeon['name']);
-    $tpl = $this->cObj->substituteMarkerArray($tpl,$marker);
+    //$tpl = $this->cObj->substituteMarkerArray($tpl,$marker);
+    $tpl = $this->substituteSubpart($tpl,'###CAN_CREATE###',$this->canCreate(),$marker);
     $tpl = $this->createSingle($tpl);
     return $tpl;
   }
@@ -461,8 +469,15 @@ class tx_wowraid_pi1 extends tslib_pibase {
   * @desc Return markers for subpart if user can create raids.
   */
   private function canCreate(){
-    if(empty($GLOBALS['TSFE']->fe_user->user))return null;
+    $user = $this->getUser();
+    if(empty($user))return null;// not logged in
+    if(empty($user['tx_wowcharacter_wowchars']))return null;// has no characters
     $marker[0]['###NEW###'] = $this->pi_linkTP_keepPIvars($this->pi_getLL('new'),array('view'=>'create'));
+    $marker[0]['###VAL_BEGIN###'] = date('d.m.Y H:00',time()+(60*60*24*7));
+    $marker[0]['###VAL_PREPARE###'] = 60;
+    foreach( $user['tx_wowcharacter_wowchars'] as $num => $char ){
+      $marker[0]['###OPTIONS_CHARS###'] .= sprintf("<option value='%d'>%s</option>\n",$char['uid'],$char['name']);
+    }
     return $marker;
   }
   
@@ -498,6 +513,21 @@ class tx_wowraid_pi1 extends tslib_pibase {
       $char['info']->characterTab->talentSpec['treeThree']
     );
     return $marker;
+  }
+
+  private function getUser($uid=null){
+    if($uid){
+      $user = $this->pi_getRecord('fe_users',$uid);
+    }else{
+      $user = $GLOBALS['TSFE']->fe_user->user;
+    }
+    if(empty($user))return null;
+    $wowchars = explode(',',$user["tx_wowcharacter_wowchars"]);
+    $user["tx_wowcharacter_wowchars"] = array();
+    foreach( $wowchars as $num => $uid ){
+      $user["tx_wowcharacter_wowchars"][$num] = $this->pi_getRecord('tx_wowcharacter_characters',$uid);
+    }
+    return $user;
   }
 
   /**

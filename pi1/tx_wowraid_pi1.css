@@ -33,6 +33,14 @@
 .tx-wowraid-pi1 .create input {width:200px;}
 .tx-wowraid-pi1 .create input.button {width:49%;}
 
+.tx-wowraid-pi1 .edit form {width:285px}
+.tx-wowraid-pi1 .edit lable {float:left;width:80px;}
+.tx-wowraid-pi1 .edit select,
+.tx-wowraid-pi1 .edit input {width:200px;}
+.tx-wowraid-pi1 .edit input.button {width:49%;}
+.tx-wowraid-pi1 .edit .participants {width:50%;float:right;}
+.tx-wowraid-pi1 .edit .participants th {border-bottom: 1px solid;}
+
 .tx_wowraid_pi1_list {}
 .tx_wowraid_pi1_list td {font-size:12px;}
 .tx_wowraid_pi1_list img {border:0;}

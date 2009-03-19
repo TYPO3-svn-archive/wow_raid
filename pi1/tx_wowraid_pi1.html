@@ -113,17 +113,17 @@
 <div class="tx_wowraid_pi1">
 <!-- ###CREATE### begin -->
 <div class="create">
-  <!-- ###FE_USER### begin -->
+  <!-- ###CAN_CREATE### begin -->
     <form action="###URL###" method="POST">
       <p>Neue Instanz erstellen:</p>
-      <lable>###LLL_NAME###:     </lable><select name="###ID_INSTANCE###">###OPTIONS_INSTANCE###</select><br/>
-      <lable>###LLL_BEGIN###:    </lable><input type="text" name="###ID_BEGIN###"    value="" /><br/>
-      <lable>###LLL_PREPARE###:  </lable><input type="text" name="###ID_PREPARE###"  value="" /><br/>
+      <lable>###LLL_INSTANCE###: </lable><select name="###ID_INSTANCE###">###OPTIONS_INSTANCE###</select><br/>
+      <lable>###LLL_BEGIN###:    </lable><input type="text" name="###ID_BEGIN###"    value="###VAL_BEGIN###" /><br/>
+      <lable>###LLL_PREPARE###:  </lable><input type="text" name="###ID_PREPARE###"  value="###VAL_PREPARE###" /><br/>
       <lable>###LLL_OFFICER###:  </lable><select name="###ID_OFFICER###">###OPTIONS_CHARS###</select><br/>
       <a href="###URL###"><input type="button" class="button" value="###LLL_CANCEL###"/></a>
       <input type="submit" class="button" value="###LLL_SUBMIT###"/>
     </form>
-  <!-- ###FE_USER### end -->
+  <!-- ###CAN_CREATE### end -->
   <!-- ###NO_USER### begin -->
   ###LLL_NOUSER###
   <a href="###URL###"><input type="button" value="###LLL_BACK###"/></a>
@@ -134,19 +134,22 @@
 <hr><!----------------------------------------------------------------------------------------------------------------->
 <div class="tx_wowraid_pi1">
 <!-- ###EDIT### begin -->
+<div class="edit">
+  <table class="participants" border="0" cellpadding="0" cellspacing="0">
+    <tr><th>###LLL_NAME###</th><th>###LLL_LEVEL###</th><th>###LLL_CLASS### (###LLL_SKILL###)</th><th>###LLL_RACE###</th></tr>
+    <!-- ###PARTICIPANTS_LIST### begin -->
+    <tr><td>###NAME### ###ICON_OFFICER###</td><td>###LEVEL###</td><td>###CLASS### (###SKILL###)</td><td>###RACE###</td></tr>
+    <!-- ###PARTICIPANTS_LIST### end -->
+  </table>
   <form action="###URL###" method="POST">
     ###HIDDEN###
-    <lable>###LLL_NAME###:     </lable><select name="###ID_INSTANCE###">###OPTIONS_INSTANCE###</select><br/>
+    <lable>###LLL_INSTANCE###: </lable><select name="###ID_INSTANCE###">###OPTIONS_INSTANCE###</select><br/>
     <lable>###LLL_BEGIN###:    </lable><input type="text" name="###ID_BEGIN###"    value="###BEGIN###"   /><br/>
     <lable>###LLL_PREPARE###:  </lable><input type="text" name="###ID_PREPARE###"  value="###PREPARE###" /><br/>
-    <table class="tx_wowraid_pi1_list" border="1">
-      <!-- ###PARTICIPANTS_LIST### begin -->
-      <tr><td>###NAME###</td></tr>
-      <!-- ###PARTICIPANTS_LIST### end -->
-    </table>
-    <a href="###URL###"><input type="button" value="###LLL_CANCEL###"/></a>
-    <input type="submit" value="###LLL_SUBMIT###"/>
+    <a href="###URL###"><input type="button" class="button" value="###LLL_CANCEL###"/></a>
+    <input type="submit" class="button" value="###LLL_SUBMIT###"/>
   </form>
+</div>
 <!-- ###EDIT### end -->
 </div>
 <!--------------------------------------------------------------------------------------------------------------------->
