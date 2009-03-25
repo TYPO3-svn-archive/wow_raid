@@ -15,6 +15,7 @@
       <label index="back">Back</label>
       <label index="admin">Admin</label>
       <label index="new">create new raid</label>
+      <label index="archive">Archive</label>
       <label index="submit">OK</label>
       <label index="cancel">CANCEL</label>
       <label index="officer">Officer</label>

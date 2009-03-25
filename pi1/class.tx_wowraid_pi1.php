@@ -65,6 +65,7 @@ class tx_wowraid_pi1 extends tslib_pibase {
     /* ACTIONS */
     if($this->piVars['create'])$this->actionCreate();
     if($this->piVars['delete'])$this->actionDelete();
+    if($this->piVars['delete'])$this->actionDelete();
     if($this->piVars['uid']){// these need a given raid to work on
       if($this->piVars['edit'])$this->actionEdit();
       if($this->piVars['join'])$this->actionJoin();
@@ -76,12 +77,14 @@ class tx_wowraid_pi1 extends tslib_pibase {
     if(!count($LOCAL_LANG))$LOCAL_LANG = $this->LOCAL_LANG['default'];// fallback to default language
     $marker = array();foreach( $LOCAL_LANG as $key => $value )$marker[sprintf('###LLL_%s###',strtoupper($key))] = $value;// build label array
     $marker['###URL###'] = $this->pi_linkTP_keepPIvars_url(array(),0,1);
+    $marker['###ARCHIVE###'] = $this->pi_linkTP_keepPIvars($this->pi_getLL('archive'),array('view'=>'archive'));
     /* VIEWS */
     switch($view){
-      case'detail': $tpl = $this->singleView($tpl); break;
-      case'create': $tpl = $this->createView($tpl); break;
-      case'edit':   $tpl = $this->editView($tpl); break;
-      default:      $tpl = $this->listView($tpl); break;
+      case'detail':   $tpl = $this->singleView($tpl); break;
+      case'create':   $tpl = $this->createView($tpl); break;
+      case'edit':     $tpl = $this->editView($tpl); break;
+      case'archive':  $tpl = $this->archiveView($tpl); break;
+      default:        $tpl = $this->listView($tpl); break;
     }
     return $this->pi_wrapInBaseClass($this->cObj->substituteMarkerArray($tpl,$marker));
 	}
@@ -234,11 +237,27 @@ class tx_wowraid_pi1 extends tslib_pibase {
   
   /* VIEWS ************************************************************************************************************/
   
-	function listView($tpl){
+  function listView($tpl){
     $tpl = $this->cObj->getSubpart($tpl,'###LISTVIEW###');
     $tpl_row = $this->cObj->getSubpart($tpl,'###RAID###');
     $tpl_empty = $this->cObj->getSubpart($tpl,'###EMPTY###');
-    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*','tx_wowraid_raids','hidden = 0 AND deleted = 0','','begin DESC');
+    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*','tx_wowraid_raids','begin >= NOW()','','begin DESC');
+    if($GLOBALS['TYPO3_DB']->sql_num_rows($res) > 0){
+      $tpl = $this->cObj->substituteSubpart($tpl,'###RAID###',$this->createList($tpl_row,$res));
+      $tpl = $this->cObj->substituteSubpart($tpl,'###EMPTY###','');
+    }else{
+      $tpl = $this->cObj->substituteSubpart($tpl,'###RAID###','');
+      $tpl = $this->cObj->substituteSubpart($tpl,'###EMPTY###',$tpl_empty);
+    }
+    $tpl = $this->substituteSubpart($tpl,'###CAN_CREATE###',$this->canCreate());
+    return $tpl;
+  }
+  
+	function archiveView($tpl){
+    $tpl = $this->cObj->getSubpart($tpl,'###LISTVIEW###');
+    $tpl_row = $this->cObj->getSubpart($tpl,'###RAID###');
+    $tpl_empty = $this->cObj->getSubpart($tpl,'###EMPTY###');
+    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*','tx_wowraid_raids','begin < NOW()','','begin DESC');
     if($GLOBALS['TYPO3_DB']->sql_num_rows($res) > 0){
       $tpl = $this->cObj->substituteSubpart($tpl,'###RAID###',$this->createList($tpl_row,$res));
       $tpl = $this->cObj->substituteSubpart($tpl,'###EMPTY###','');
