@@ -32,7 +32,7 @@ $EM_CONF[$_EXTKEY] = array(
 	'version' => '0.0.0',
 	'constraints' => array(
 		'depends' => array(
-			'wow_character' => '',
+			'wow_character' => '0.1.3',
 		),
 		'conflicts' => array(
 		),

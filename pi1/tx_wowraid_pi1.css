@@ -13,9 +13,10 @@
 
 .tx-wowraid-pi1 .singleview {}
 .tx-wowraid-pi1 .singleview h2 {clear:both;}
-.tx-wowraid-pi1 .singleview dl {margin: 0 0 15px 0;}
+.tx-wowraid-pi1 .singleview dl {margin: 0 0 15px 0;float:left;width:200px;}
 .tx-wowraid-pi1 .singleview dl dt {float:left;width:80px;font-weight: bold;}
-.tx-wowraid-pi1 .singleview dl dd {}
+.tx-wowraid-pi1 .singleview dl dd {margin:0 0 0 100px;}
+.tx-wowraid-pi1 .singleview .portal {float:left;}
 .tx-wowraid-pi1 .singleview .participants {width:50%;float:right;}
 .tx-wowraid-pi1 .singleview .participants th {border-bottom: 1px solid;}
 .tx-wowraid-pi1 .singleview .comments {width:100%;clear:both;}
@@ -27,7 +28,7 @@
 .tx-wowraid-pi1 .singleview .comments .author {width:20%;}
 .tx-wowraid-pi1 .singleview .comments .message {width:80%;}
 
-.tx-wowraid-pi1 .create {width:290px;padding:5px;border: 1px dotted;}
+.tx-wowraid-pi1 .create {width:290px;padding:5px;border: 1px dotted;line-height:20px;}
 .tx-wowraid-pi1 .create lable {float:left;width:80px;}
 .tx-wowraid-pi1 .create select,
 .tx-wowraid-pi1 .create input {width:200px;}

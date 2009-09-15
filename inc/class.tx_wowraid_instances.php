@@ -8,13 +8,15 @@ class tx_wowraid_instances{
     private $xml1 = null;
     private $xml2 = null;
     private $tmp = null;
+    private $local = null;
 
     public $dungeons = array();
       
-    public function tx_wowraid_instances($lang=null){
+    public function tx_wowraid_instances($lang='de-DE'){
+      if(!eregi('^([a-z]{2})[-_]{1}([a-z]{2})$',$lang,$this->local))throw new Exception('could not read locale');// get system language
       $dungeon_names = array();
       $boss_names = array();
-      if( !$this->load($lang) && $this->query($lang) ) $this->save($lang);
+      if( !$this->load() && $this->query() ) $this->save();
       // parse names
       foreach( $this->xml2->dungeons->dungeon as $dungeon_num => $dungeon ){
         $dungeon_names[intval($dungeon['id'])] = strval($dungeon['name']);
@@ -43,32 +45,39 @@ class tx_wowraid_instances{
       }
     }
     
-    private function query($lang='de-de'){
+    private function query(){
+      $locale = sprintf('%s_%s',strtolower($this->local[1]),strtolower($this->local[2]));
       libxml_use_internal_errors(false); libxml_clear_errors();
       libxml_set_streams_context(stream_context_create(array('http' => array(
-        'user_agent' => sprintf('Mozilla/5.0 (Windows; U; Windows NT 5.1; %s; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6',$lang),
-        'header' => sprintf('Accept-language: %s',$lang),
+        'user_agent' => sprintf('Mozilla/5.0 (Windows; U; Windows NT 5.1; %s; rv:1.8) Gecko/20051111 Firefox/1.5',$this->local[1]),
+        'header' => sprintf('Accept-Language: %s, en',$this->local[1]),
       ))));
-      $url1 = 'http://eu.wowarmory.com/data/dungeons.xml';
-      $url2 = 'http://eu.wowarmory.com/data/dungeonStrings.xml';
+      $url1 = 'http://eu.wowarmory.com/data/dungeons.xml?locale='.$locale;
+      $url2 = 'http://eu.wowarmory.com/data/dungeonStrings.xml?locale='.$locale;
       $this->xml1 = simplexml_load_file($url1);
       $this->xml2 = simplexml_load_file($url2);
       return( $this->xml1->dungeon && $this->xml2->dungeons->dungeon );
     }
     
     private function load(){
-      if(!file_exists(TYPO3TEMP.'tx_wowraid_dungeons.xml'))return false;
-      if(!file_exists(TYPO3TEMP.'tx_wowraid_dungeonStrings.xml'))return false;
-      if( ( time() - filemtime(TYPO3TEMP.'tx_wowraid_dungeons.xml') ) > CACHETIME )return false;
-      if( ( time() - filemtime(TYPO3TEMP.'tx_wowraid_dungeonStrings.xml') ) > CACHETIME )return false;
-      $this->xml1 = simplexml_load_file(TYPO3TEMP.'tx_wowraid_dungeons.xml');
-      $this->xml2 = simplexml_load_file(TYPO3TEMP.'tx_wowraid_dungeonStrings.xml');
+      $file1 = sprintf(TYPO3TEMP.'tx_wowraid_dungeons_%s.xml',strtolower($this->local[1].$this->local[2]));
+      $file2 = sprintf(TYPO3TEMP.'tx_wowraid_dungeonStrings_%s.xml',strtolower($this->local[1].$this->local[2]));
+      if(!file_exists($file1))return false;
+      if(!file_exists($file2))return false;
+      if( ( time() - filemtime($file1) ) > CACHETIME )return false;
+      if( ( time() - filemtime($file2) ) > CACHETIME )return false;
+      $this->xml1 = simplexml_load_file($file1);
+      $this->xml2 = simplexml_load_file($file2);
       return( $this->xml1->dungeon && $this->xml2->dungeons->dungeon );
     }
     
     private function save(){
-      $this->xml1->asXML(TYPO3TEMP.'tx_wowraid_dungeons.xml');
-      $this->xml2->asXML(TYPO3TEMP.'tx_wowraid_dungeonStrings.xml');
+      $lang = $this->xml2['lang'];
+      if(!eregi('^([a-z]{2})_([a-z]{2})$',$lang,$lang))throw new Exception('incorrect language');
+      $file1 = sprintf(TYPO3TEMP.'tx_wowraid_dungeons_%s.xml',strtolower($lang[1].$lang[2]));
+      $file2 = sprintf(TYPO3TEMP.'tx_wowraid_dungeonStrings_%s.xml',strtolower($lang[1].$lang[2]));
+      $this->xml1->asXML($file1);
+      $this->xml2->asXML($file2);
     }
     
     public function getInstance($id){
@@ -77,7 +86,7 @@ class tx_wowraid_instances{
 
 }
 
-if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wow_raid/class.tx_wowraid_instances.php']) {
-  include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wow_raid/class.tx_wowraid_instances.php']);
+if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wow_raid/inc/class.tx_wowraid_instances.php']) {
+  include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wow_raid/inc/class.tx_wowraid_instances.php']);
 }
 ?>

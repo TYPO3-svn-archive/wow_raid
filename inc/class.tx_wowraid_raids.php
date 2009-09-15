@@ -45,8 +45,8 @@ class tx_wowraid_raid{
 
 /**********************************************************************************************************************/
 
-if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wow_raid/class.tx_wowraid_raids.php']) {
-  include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wow_raid/class.tx_wowraid_raids.php']);
+if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wow_raid/inc/class.tx_wowraid_raids.php']) {
+  include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wow_raid/inc/class.tx_wowraid_raids.php']);
 }
 
 ?>

@@ -3,17 +3,18 @@ plugin.tx_wowraid_pi1 {
     html = TEMPLATE
     html {
       template = FILE
-      template.file = {$plugin.tx_wowraid_pi1.template.html}
+      template.file = {$plugin.tx_wowraid_pi1.template}
     }
   }
-  css = typo3conf/ext/wow_raid/pi1/tx_wowraid_pi1.css
   charviewPID = {$plugin.tx_wowraid_pi1.charviewPID}
 }
 plugin.tx_wowraid_pi1.listView {
 }
 plugin.tx_wowraid_pi1.singleview{
+  officer.wrap = |&nbsp;<img src="typo3conf/ext/wow_raid/res/gfx/crown.png" />
 }
 plugin.tx_wowraid_pi1.create{
 }
 plugin.tx_wowraid_pi1.edit{
 }
+page.includeCSS.tx_wowraid_pi1 = {$plugin.tx_wowraid_pi1.css}

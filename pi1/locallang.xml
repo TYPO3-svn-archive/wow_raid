@@ -46,6 +46,7 @@
       <label index="back">Zurück</label>
       <label index="admin">Admin</label>
       <label index="new">Neuer Raid</label>
+      <label index="archive">Archiv</label>
       <label index="submit">OK</label>
       <label index="cancel">CANCEL</label>
       <label index="officer">Raidleiter</label>

@@ -8,7 +8,7 @@ $TCA['tt_content']['types']['list']['subtypes_excludelist'][$_EXTKEY.'_pi1']='la
 t3lib_extMgm::addPlugin(array('LLL:EXT:wow_raid/locallang_db.xml:tt_content.list_type_pi1', $_EXTKEY.'_pi1'),'list_type');
 
 
-t3lib_extMgm::addStaticFile($_EXTKEY,'pi1/static/','World of Warcraft - Raids');
+t3lib_extMgm::addStaticFile($_EXTKEY,'pi1/static/','WOW - Raids');
 
 
 if (TYPO3_MODE=="BE")	$TBE_MODULES_EXT["xMOD_db_new_content_el"]["addElClasses"]["tx_wowraid_pi1_wizicon"] = t3lib_extMgm::extPath($_EXTKEY).'pi1/class.tx_wowraid_pi1_wizicon.php';

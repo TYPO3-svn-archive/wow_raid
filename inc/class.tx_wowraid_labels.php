@@ -46,6 +46,10 @@ class tx_wowraid_labels{
     foreach( $this->instances->dungeons as $key => $data )$config['items'][] = array( $data['name'], $key );
     return $config;
   }
-  
+
+}
+
+if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wow_raid/inc/class.tx_wowraid_labels.php']) {
+  include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wow_raid/inc/class.tx_wowraid_labels.php']);
 }
 ?>

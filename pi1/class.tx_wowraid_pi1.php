@@ -39,6 +39,7 @@ class tx_wowraid_pi1 extends tslib_pibase {
 	var $scriptRelPath = 'pi1/class.tx_wowraid_pi1.php';	// Path to this script relative to the extension dir.
 	var $extKey        = 'wow_raid';	// The extension key.
   var $instances     = null;
+	var $locale				 = null;
 	
 	/**
 	 * Main method of your PlugIn
@@ -53,15 +54,16 @@ class tx_wowraid_pi1 extends tslib_pibase {
     $this->pi_loadLL();    // Loading the LOCAL_LANG values
     $this->pi_USER_INT_obj=1;  // Configuring so caching is not expected. This value means that no cHash params are ever set. We do this, because it's a USER_INT object!
     $this->pi_initPIflexForm();
+		if(!eregi('^([a-z]{2})[-_]{1}([a-z]{2})$',$GLOBALS['TSFE']->config['config']['locale_all'],$this->locale))throw new Exception('could not read config.locale_all');// get system language
     if(!( $this->conf['pid'] = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'raids_folder', 'sDEF') )) throw new Exception('No start folder defined!');
     $GLOBALS['TYPO3_DB']->debugOutput = false;
-    $this->instances = new tx_wowraid_instances();    
+    $this->instances = new tx_wowraid_instances($this->locale[0]);
     $GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'0'] = '<link rel="stylesheet" href="'.$this->conf['css'].'" type="text/css" />';
     $GLOBALS['TSFE']->additionalHeaderData[$this->extKey.'1'] = '<link rel="alternate" type="application/rss+xml" title="RSS" href="'.'http://'.$_SERVER['HTTP_HOST'].'/'.$_SERVER['SCRIPT_NAME'].'?type=99" />';
     $view = $this->piVars['view'];
     
     //$raids = new tx_wowraid_raids(12);
-    
+		
     /* ACTIONS */
     if($this->piVars['create'])$this->actionCreate();
     if($this->piVars['delete'])$this->actionDelete();
@@ -77,7 +79,11 @@ class tx_wowraid_pi1 extends tslib_pibase {
     if(!count($LOCAL_LANG))$LOCAL_LANG = $this->LOCAL_LANG['default'];// fallback to default language
     $marker = array();foreach( $LOCAL_LANG as $key => $value )$marker[sprintf('###LLL_%s###',strtoupper($key))] = $value;// build label array
     $marker['###URL###'] = $this->pi_linkTP_keepPIvars_url(array(),0,1);
-    $marker['###ARCHIVE###'] = $this->pi_linkTP_keepPIvars($this->pi_getLL('archive'),array('view'=>'archive'));
+		if($view=='archive'){
+			$marker['###ARCHIVE###'] = $this->pi_linkTP($this->pi_getLL('back'),array());
+		}else{
+			$marker['###ARCHIVE###'] = $this->pi_linkTP_keepPIvars($this->pi_getLL('archive'),array('view'=>'archive'));
+		}
     /* VIEWS */
     switch($view){
       case'detail':   $tpl = $this->singleView($tpl); break;
@@ -120,22 +126,7 @@ class tx_wowraid_pi1 extends tslib_pibase {
     }
     return $xml->asXML();
   }
-  
-  /**
-  * @desc Substitute markers and subparts in a template. Markers with sub-markers represent subparts.
-  * @desc $marker = array( 'MARKER' => 'VALUE', 'SUBPART' => array( 'MARKER' => 'VALUE' ) );
-  * @desc Subparts inherit markers from parents.
-  */
-  function parse($tpl,$marker){
-    $submarker = array_filter($marker,'is_array');// extract arrays
-    $marker = array_diff_key($marker,$submarker);// filter arrays
-    foreach( $submarker as $key => $value )// handle possible subparts
-      while( $subtpl = $this->cObj->getSubpart($tpl,$key) )// fetch all subparts in template
-        $tpl = $this->cObj->substituteSubpart($tpl,$key,$this->parse($subtpl,array_merge($marker,$value)));// substitute subparts
-    $tpl = $this->cObj->substituteMarkerArray($tpl,$marker);// substitute markers
-    return $tpl;
-  }
-  
+
   /* ACTIONS **********************************************************************************************************/
   
   /**
@@ -241,7 +232,7 @@ class tx_wowraid_pi1 extends tslib_pibase {
     $tpl = $this->cObj->getSubpart($tpl,'###LISTVIEW###');
     $tpl_row = $this->cObj->getSubpart($tpl,'###RAID###');
     $tpl_empty = $this->cObj->getSubpart($tpl,'###EMPTY###');
-    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*','tx_wowraid_raids','begin >= NOW()','','begin DESC');
+    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*','tx_wowraid_raids','begin >= UNIX_TIMESTAMP()','','begin ASC');
     if($GLOBALS['TYPO3_DB']->sql_num_rows($res) > 0){
       $tpl = $this->cObj->substituteSubpart($tpl,'###RAID###',$this->createList($tpl_row,$res));
       $tpl = $this->cObj->substituteSubpart($tpl,'###EMPTY###','');
@@ -257,7 +248,7 @@ class tx_wowraid_pi1 extends tslib_pibase {
     $tpl = $this->cObj->getSubpart($tpl,'###LISTVIEW###');
     $tpl_row = $this->cObj->getSubpart($tpl,'###RAID###');
     $tpl_empty = $this->cObj->getSubpart($tpl,'###EMPTY###');
-    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*','tx_wowraid_raids','begin < NOW()','','begin DESC');
+    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*','tx_wowraid_raids','begin < UNIX_TIMESTAMP()','','begin DESC');
     if($GLOBALS['TYPO3_DB']->sql_num_rows($res) > 0){
       $tpl = $this->cObj->substituteSubpart($tpl,'###RAID###',$this->createList($tpl_row,$res));
       $tpl = $this->cObj->substituteSubpart($tpl,'###EMPTY###','');
@@ -281,8 +272,9 @@ class tx_wowraid_pi1 extends tslib_pibase {
 
   function createView($tpl){
     $tpl = $this->cObj->getSubpart($tpl,'###CREATE###');
-    if(!$GLOBALS['TSFE']->fe_user->user)return "Please login!";
-    if(empty($GLOBALS['TSFE']->fe_user->user["tx_wowcharacter_wowchars"]))return "You don't have any characters!";
+		$user = $this->getUser();// get current user
+    if(empty($user))return "Please login!";//TODO: move to locallang
+    if(!count($user['wowchars']))return "You don't have any characters!";//TODO: move to locallang
     $marker['###ID_INSTANCE###']  = "tx_wowraid_pi1[create][instance]";
     $marker['###ID_BEGIN###']     = "tx_wowraid_pi1[create][begin]";
     $marker['###ID_PREPARE###']   = "tx_wowraid_pi1[create][prepare]";
@@ -326,6 +318,7 @@ class tx_wowraid_pi1 extends tslib_pibase {
       $officer = array_shift(explode(',',$data['participants']));
       $marker['###HIDDEN###'] .= sprintf("<input type='hidden' name='tx_wowraid_pi1[uid]' value='%d'>\n",$data['uid']);
       $marker['###INSTANCE###'] = $dungeon['name'];
+			$marker = marker_merge($marker,$dungeon,'INSTANCE.');
       $marker['###INSTANCE->DETAIL###'] = $this->pi_linkTP_keepPIvars($marker['###INSTANCE###'],array('view'=>'detail','uid'=>$data['uid']));
       $marker['###BEGIN###'] = date('d.m.Y H:i',$data['begin']);
       $marker['###DAYS###'] = round( ( $data['begin'] - time() ) / 60 / 60 / 24 );
@@ -340,11 +333,13 @@ class tx_wowraid_pi1 extends tslib_pibase {
       }
     }
     
-    if( ( $submarker = $this->canJoin() )
-    &&  ( $tpl_can_join = $this->cObj->getSubpart($tpl,'###CAN_JOIN###') )
+    if( $data['begin'] > time()
+    && ( $submarker = $this->canJoin() )
+    && ( $tpl_can_join = $this->cObj->getSubpart($tpl,'###CAN_JOIN###') )
     )$tpl_can_join = $this->cObj->substituteMarkerArray($tpl_can_join,array_merge($marker,$submarker));
     
-    if( ( $submarker = $this->canComment($GLOBALS['TSFE']->fe_user->user,$data['participants']) )
+    if( $data['begin'] > time()
+    && ( $submarker = $this->canComment($this->getUser(),$data['participants']) )
     &&  ( $tpl_can_comment = $this->cObj->getSubpart($tpl,'###CAN_COMMENT###') )
     )$tpl_can_comment = $this->cObj->substituteMarkerArray($tpl_can_comment,array_merge($marker,$submarker));
     
@@ -392,9 +387,11 @@ class tx_wowraid_pi1 extends tslib_pibase {
   */
   function createParticipantSingle($tpl,$row,$officer=false){
     $marker = $this->getCharacter($row['uid']);
-    $marker['###ICON_OFFICER###'] = '';
     if($officer){
-      $marker['###ICON_OFFICER###'] = '<img src="typo3conf/ext/wow_raid/res/gfx/crown.png">';
+			$marker['###NAME###'] = $this->cObj->TEXT(array(
+				'value'=>$marker['###NAME###'],
+				'stdWrap.'=>$this->conf['singleview.']['officer.'],
+			));
     }
     return $this->cObj->substituteMarkerArray($tpl,$marker);
   }
@@ -436,9 +433,9 @@ class tx_wowraid_pi1 extends tslib_pibase {
       '###PARTICIPANTS_DR###' => 0,
       '###PARTICIPANTS_DK###' => 0,
     );
-    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('realm,name','tx_wowcharacter_characters','uid IN ('.$participants.')','','name');
+    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid,pid','tx_wowcharacter_characters','uid IN ('.$participants.')','','name');
     while( $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res) ){
-      $char = new tx_wowcharacter_character($row['realm'],$row['name']);
+      $char = new tx_wowcharacter_character(array('where'=>array('uid'=>$row['uid'],'pid'=>$row['pid'])));
       $char = $char->xml->characterInfo;
       switch(intval($char->character['classId'])){
         case CLASSID_WR: $result['###PARTICIPANTS_WR###']++; break;
@@ -462,11 +459,9 @@ class tx_wowraid_pi1 extends tslib_pibase {
   * @desc Return markers for subpart if user is allowed to join a raid.
   */
   private function canJoin(){
-    if(empty($GLOBALS['TSFE']->fe_user->user))return null;
-    $wowchars = $GLOBALS['TSFE']->fe_user->user["tx_wowcharacter_wowchars"];
-    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*','tx_wowcharacter_characters',sprintf('uid IN (%s) AND hidden = 0 AND deleted = 0',$wowchars));
-    while( $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res) )
-      $marker['###OPTIONS_CHARS###'] .= sprintf("<option value='%d'>%s</option>\n",$row['uid'],$row['name']);
+		$user = $this->getUser();
+    if(empty($user))return null;
+    foreach( $user['wowchars'] as $uid => $row ) $marker['###OPTIONS_CHARS###'] .= sprintf("<option value='%d'>%s</option>\n",$row['uid'],$row['name']);
     return $marker;  
   }
   
@@ -474,13 +469,17 @@ class tx_wowraid_pi1 extends tslib_pibase {
   * @desc Return markers for subpart if user is allowed to comment a raid.
   */
   private function canComment($author,$participants){
-    if(empty($author))return null;
+    if(empty($author))return null;// check if login
+    if(empty($author['wowchars']))return null;// check if user has chars
+		$CharUIDInRaid = array_intersect(array_keys($author['wowchars']),explode(',',$participants));
+		if(empty($CharUIDInRaid))return null;// check if user os participating
     $author = $this->getAuthor($author,$participants);
-    if(empty($author['character']))return null;
     $result = array(
       '###AUTHOR###' => $author['username'],
-      '###CHARACTER###' => $author['character']['name'],
+      '###CHARACTER###' => $author['wowchars'][$CharUIDInRaid[0]]['name'],
     );
+		$result = marker_merge($result,$author['wowchars'][$CharUIDInRaid[0]],'CHARACTER.');
+		//print('<pre>');var_dump($result);die('</pre>');/*DEBUG*/
     return $result;
   }
 
@@ -490,11 +489,11 @@ class tx_wowraid_pi1 extends tslib_pibase {
   private function canCreate(){
     $user = $this->getUser();
     if(empty($user))return null;// not logged in
-    if(empty($user['tx_wowcharacter_wowchars']))return null;// has no characters
+    if(!count($user['wowchars']))return null;// has no characters
     $marker[0]['###NEW###'] = $this->pi_linkTP_keepPIvars($this->pi_getLL('new'),array('view'=>'create'));
     $marker[0]['###VAL_BEGIN###'] = date('d.m.Y H:00',time()+(60*60*24*7));
     $marker[0]['###VAL_PREPARE###'] = 60;
-    foreach( $user['tx_wowcharacter_wowchars'] as $num => $char ){
+    foreach( $user['wowchars'] as $num => $char ){
       $marker[0]['###OPTIONS_CHARS###'] .= sprintf("<option value='%d'>%s</option>\n",$char['uid'],$char['name']);
     }
     return $marker;
@@ -510,10 +509,11 @@ class tx_wowraid_pi1 extends tslib_pibase {
   
   private function getCharacter($uid){
     $char = $this->pi_getRecord('tx_wowcharacter_characters',$uid);
-    $char['info'] = new tx_wowcharacter_character($char['realm'],$char['name']);
+    $char['info'] = new tx_wowcharacter_character(array('where'=>array('uid'=>$char['uid'],'pid'=>$char['pid'])));
     $char['info'] = $char['info']->xml->characterInfo;
     $marker = array();
     $marker['###NAME###'] = $char['name'];
+    $marker['###UID###'] = $char['uid'];
     if($this->conf['charviewPID'])$marker['###NAME###'] = $this->pi_linkToPage(
       $marker['###NAME###'],
       $this->conf['charviewPID'],
@@ -525,12 +525,11 @@ class tx_wowraid_pi1 extends tslib_pibase {
     $marker['###LEVEL###']  = intval($char['info']->character['level']);
     $marker['###RACE###']   = strval($char['info']->character['race']);
     $marker['###GUILD###']  = strval($char['info']->character['guildName']);
-    $marker['###SKILL###']  = sprintf(
-      '%02d/%02d/%02d',
-      $char['info']->characterTab->talentSpec['treeOne'],
-      $char['info']->characterTab->talentSpec['treeTwo'],
-      $char['info']->characterTab->talentSpec['treeThree']
-    );
+		$talentSpec = $char['info']->characterTab->talentSpecs->talentSpec;
+		if($talentSpec[0]["active"]) $talentSpec = $talentSpec[0]; else $talentSpec = $talentSpec[1];// find active spec
+    $marker['###SKILL###']  = sprintf('%02d/%02d/%02d',$talentSpec['treeOne'],$talentSpec['treeTwo'],$talentSpec['treeThree']);
+		$marker = marker_merge($marker,$talentSpec,'SKILL.');
+		//print('<pre>');var_dump($marker);die('</pre>');/*DEBUG*/
     return $marker;
   }
 
@@ -541,11 +540,7 @@ class tx_wowraid_pi1 extends tslib_pibase {
       $user = $GLOBALS['TSFE']->fe_user->user;
     }
     if(empty($user))return null;
-    $wowchars = explode(',',$user["tx_wowcharacter_wowchars"]);
-    $user["tx_wowcharacter_wowchars"] = array();
-    foreach( $wowchars as $num => $uid ){
-      $user["tx_wowcharacter_wowchars"][$num] = $this->pi_getRecord('tx_wowcharacter_characters',$uid);
-    }
+    $user['wowchars'] = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows('*','tx_wowcharacter_characters',sprintf('fe_user = %d',$user['uid']),'','','','uid');
     return $user;
   }
 
@@ -563,9 +558,38 @@ class tx_wowraid_pi1 extends tslib_pibase {
           $tmp .= $this->cObj->substituteMarkerArray($tpl_sub,array_merge($marker,$singlemarker));// parse template
     return $this->cObj->substituteSubpart($tpl,$subpart,$tmp);
   }
+
+  /**
+  * @desc Substitute markers and subparts in a template. Markers with a list of sub-marker-sets represent subparts.
+  * @desc $marker = array( 'MARKER' => 'VALUE', 'SUBPART' => array( ENTRY_UID => array( 'MARKER' => 'VALUE' ) ) );
+  * @desc Subparts inherit markers from parents.
+  */
+  private function parse($tpl,$marker){
+    $subparts = array_filter($marker,'is_array');// extract arrays
+    $marker = array_diff_key($marker,$subparts);// filter arrays
+    foreach( $subparts as $key => $entrys ){
+			while( $subtpl = $this->cObj->getSubpart($tpl,$key) ){
+				$tmp = '';
+				foreach( $entrys as $uid => $submarker ){
+					$tmp .= sprintf('<!-- %s[%d] begin -->',substr($key,3,-3),$uid);
+					$tmp .= $this->parse($subtpl,array_merge($marker,$submarker));// parse and collect every entry
+					$tmp .= sprintf('<!-- %s[%d] end -->',substr($key,3,-3),$uid);
+				}
+				$tpl = $this->cObj->substituteSubpart($tpl,$key,$tmp,0);// substitute first subpart
+			}
+		}
+    $tpl = $this->cObj->substituteMarkerArray($tpl,$marker);// substitute markers
+    return $tpl;
+  }
   
 }
 
+function marker_merge($marker,$array,$prefix=''){
+	$append = array();
+	if(get_class($array)=='SimpleXMLElement') $array = $array->attributes();
+	foreach($array as $key => $val)$append[strtoupper(sprintf('###%s%s###',$prefix,$key))] = strval($val);
+	return array_merge($marker,$append);
+}
 
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wow_raid/pi1/class.tx_wowraid_pi1.php'])	{
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wow_raid/pi1/class.tx_wowraid_pi1.php']);

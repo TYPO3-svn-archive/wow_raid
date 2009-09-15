@@ -5,6 +5,25 @@
   <link rel="stylesheet" type="text/css" href="tx_wowraid_pi1.css" />
 </head>    
 <body>
+<!-- Icons @ Armory:
+http://armory.wow-europe.com/wow-icons/_images/21x21/spell_shadow_deathcoil.png
+http://armory.wow-europe.com/wow-icons/_images/43x43/spell_shadow_deathcoil.png
+["###NAME###"]=>string(4) "Jobe"
+["###UID###"]=>string(1) "1"
+["###REALM###"]=>string(9) "Blackhand"
+["###CLASS###"]=>string(7) "Warlock"
+["###LEVEL###"]=>int(80)
+["###RACE###"]=>string(5) "Human"
+["###GUILD###"]=>string(3) "PAX"
+["###SKILL###"]=>string(8) "54/00/17"
+["###SKILL.ACTIVE###"]=>string(1) "1"
+["###SKILL.GROUP###"]=>string(1) "1"
+["###SKILL.ICON###"]=>string(22) "spell_shadow_deathcoil"
+["###SKILL.PRIM###"]=>string(10) "Affliction"
+["###SKILL.TREEONE###"]=>string(2) "54"
+["###SKILL.TREETHREE###"]=>string(2) "17"
+["###SKILL.TREETWO###"]=>string(1) "0"
+-->
 <hr><!----------------------------------------------------------------------------------------------------------------->
 <div class="tx_wowraid_pi1">
 <!-- ###LISTVIEW### begin -->
@@ -23,16 +42,16 @@
       <td class="col3" valign="top">###INVITE###</td>
       <td class="col4" valign="top"><table class="participants" cellpadding="0" cellspacing="0" border="0" valign="top" width="100%">
         <tr>
-          <td><img width="20px" title="Warrior"     src="typo3conf/ext/wow_raid/res/gfx/classicons/warrior.png"     ></td>
-          <td><img width="20px" title="Warlock"     src="typo3conf/ext/wow_raid/res/gfx/classicons/warlock.png"     ></td>
-          <td><img width="20px" title="Shaman"      src="typo3conf/ext/wow_raid/res/gfx/classicons/shaman.png"      ></td>
-          <td><img width="20px" title="Rouge"       src="typo3conf/ext/wow_raid/res/gfx/classicons/rogue.png"       ></td>
-          <td><img width="20px" title="Priest"      src="typo3conf/ext/wow_raid/res/gfx/classicons/priest.png"      ></td>
-          <td><img width="20px" title="Paladin"     src="typo3conf/ext/wow_raid/res/gfx/classicons/paladin.png"     ></td>
-          <td><img width="20px" title="Mage"        src="typo3conf/ext/wow_raid/res/gfx/classicons/mage.png"        ></td>
-          <td><img width="20px" title="Hunter"      src="typo3conf/ext/wow_raid/res/gfx/classicons/hunter.png"      ></td>
-          <td><img width="20px" title="Druid"       src="typo3conf/ext/wow_raid/res/gfx/classicons/druid.png"       ></td>
-          <td><img width="20px" title="Deathknight" src="typo3conf/ext/wow_raid/res/gfx/classicons/deathknight.png" ></td>
+          <td><img width="20px" title="Krieger"     	src="typo3conf/ext/wow_raid/res/gfx/classicons/warrior.png"     ></td>
+          <td><img width="20px" title="Hexenmeister"	src="typo3conf/ext/wow_raid/res/gfx/classicons/warlock.png"     ></td>
+          <td><img width="20px" title="Shamane"     	src="typo3conf/ext/wow_raid/res/gfx/classicons/shaman.png"      ></td>
+          <td><img width="20px" title="Schurke"     	src="typo3conf/ext/wow_raid/res/gfx/classicons/rogue.png"       ></td>
+          <td><img width="20px" title="Priester"   		src="typo3conf/ext/wow_raid/res/gfx/classicons/priest.png"      ></td>
+          <td><img width="20px" title="Paladin"   		src="typo3conf/ext/wow_raid/res/gfx/classicons/paladin.png"     ></td>
+          <td><img width="20px" title="Magier"     		src="typo3conf/ext/wow_raid/res/gfx/classicons/mage.png"        ></td>
+          <td><img width="20px" title="Jäger"      		src="typo3conf/ext/wow_raid/res/gfx/classicons/hunter.png"      ></td>
+          <td><img width="20px" title="Druide"    		src="typo3conf/ext/wow_raid/res/gfx/classicons/druid.png"       ></td>
+          <td><img width="20px" title="Todesritter"		src="typo3conf/ext/wow_raid/res/gfx/classicons/deathknight.png" ></td>
         </tr>
         <tr>
           <td>###PARTICIPANTS_WR###</td>
@@ -69,7 +88,16 @@
     <table class="participants" border="0" cellpadding="0" cellspacing="0">
       <tr><th>###LLL_NAME###</th><th>###LLL_LEVEL###</th><th>###LLL_CLASS### (###LLL_SKILL###)</th><th>###LLL_RACE###</th></tr>
       <!-- ###PARTICIPANTS_LIST### begin -->
-      <tr><td>###NAME### ###ICON_OFFICER###</td><td>###LEVEL###</td><td>###CLASS### (###SKILL###)</td><td>###RACE###</td></tr>
+      <tr>
+				<td>###NAME###</td>
+				<td>###LEVEL###</td>
+				<td>
+					<!--img src="typo3conf/ext/wow_raid/res/gfx/classicons/###CLASS###.png" width="13" height="13" /-->
+					<img src="http://armory.wow-europe.com/wow-icons/_images/21x21/###SKILL.ICON###.png" width="15" height="15" alt="###SKILL.PRIM###" title="###SKILL.PRIM###" />
+					###CLASS### (###SKILL###)
+				</td>
+				<td>###RACE###</td>
+			</tr>
       <!-- ###PARTICIPANTS_LIST### end -->
       <!-- ###CAN_JOIN### begin -->
       <tr><td colspan="4"><form action="###URL###" method="POST">
@@ -79,14 +107,15 @@
       <!-- ###CAN_JOIN### end -->
     </table>
     
-    
-    <dl>
+    <dl class="data">
       <dt>###LLL_BEGIN###:    </dt><dd>###BEGIN###    </dd>
       <dt>###LLL_PREPARE###:  </dt><dd>###PREPARE###  </dd>
       <dt>###LLL_INVITE###:   </dt><dd>###INVITE###   </dd>
       <dt>###LLL_DAYS###:     </dt><dd>###DAYS###     </dd>
     </dl>
     
+		<a href="http://www.wowwiki.com/###INSTANCE.KEY###" target="_blank"><img class="portal" src="typo3conf/ext/wow_raid/res/gfx/instances/###INSTANCE.KEY###.jpg" /></a>
+		
     <h2>###LLL_COMMENTS###</h2>
     
     <table class="comments" border="0" cellpadding="0" cellspacing="0">

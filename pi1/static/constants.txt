@@ -1,4 +1,8 @@
 plugin.tx_wowraid_pi1 {
-  #cat=plugin.tx_wowraid_pi1/other/a; type=int; label=charviewPID: PID of page to display character.
+  #cat=plugin.tx_wowraid_pi1/other/a; type=string; label=Template: Specify path to template here.
+  template = EXT:wow_raid/pi1/tx_wowraid_pi1.html
+  #cat=plugin.tx_wowraid_pi1/other/b; type=string; label=CSS: Specify path to css file here.
+  css = EXT:wow_raid/pi1/tx_wowraid_pi1.css
+  #cat=plugin.tx_wowraid_pi1/other/c; type=int; label=charviewPID: PID of page to display character.
   charviewPID =
 }
