@@ -54,7 +54,7 @@ class tx_wowraid_pi1 extends tslib_pibase {
     $this->pi_loadLL();    // Loading the LOCAL_LANG values
     $this->pi_USER_INT_obj=1;  // Configuring so caching is not expected. This value means that no cHash params are ever set. We do this, because it's a USER_INT object!
     $this->pi_initPIflexForm();
-		if(!eregi('^([a-z]{2})[-_]{1}([a-z]{2})$',$GLOBALS['TSFE']->config['config']['locale_all'],$this->locale))throw new Exception('could not read config.locale_all');// get system language
+		if(!eregi('^([a-z]{2})[-_]{1}([a-z]{2})',$GLOBALS['TSFE']->config['config']['locale_all'],$this->locale))throw new Exception('could not read config.locale_all');// get system language
     if(!( $this->conf['pid'] = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'raids_folder', 'sDEF') )) throw new Exception('No start folder defined!');
     $GLOBALS['TYPO3_DB']->debugOutput = false;
     $this->instances = new tx_wowraid_instances($this->locale[0]);
